@@ -4,12 +4,10 @@
 
 'use strict';
 
-var path = require('path');
-var jade = require('jade');
+var Template = require('./template');
 
 function index(req, res) {
-    var templatePath = path.join(global.RootDir, '/views/index.jade');
-    res.write(jade.renderFile(templatePath, {hello: 'world'}));
+    res.write(Template.render('views/index.jade', {hello: 'world'}));
     res.end();
 }
 
