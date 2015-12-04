@@ -1,18 +1,10 @@
 'use strict';
 
 var RedisSentinel = require('./services/sentinel');
-var Storage = require('./services/storage');
+var config = require('./config.json');
 
-var monitorLoop = function () {
-  RedisSentinel.sentinels.forEach(function(ele, index, arr) {
-    ele.ping().then(function (result) {
-      var sentinelInfo = ele.options;
-      var sentinelAddress = sentinelInfo.host + ':' + sentinelInfo.port;
-      var sentinelStatus = result === 'PONG' ? 'ON' : 'OFF';
+setInterval(RedisSentinel.sentinel_status,
+    config.sentinel_status_interval ? config.sentinel_status_interval : 5000);
 
-      Storage.updateSentinelStatus(sentinelAddress, sentinelStatus);
-    });
-  });
-};
-
-setInterval(monitorLoop, 3000);
+setInterval(RedisSentinel.cluster_status,
+    config.cluster_info_interval ? config.cluster_info_interval : 10000);

@@ -14,6 +14,9 @@
       "port": "26399"
     }
   ],
+  "master_name": "mymaster",
   "auth": "1qazxsw2",
-  "storage_file": "./rsm.db"
+  "storage_file": "./rsm.db",
+  "sentinel_status_interval": 5000,
+  "cluster_info_interval": 10000
 }
