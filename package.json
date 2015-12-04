@@ -9,6 +9,7 @@
   "author": "youngsterxyf",
   "license": "ISC",
   "dependencies": {
-    "ioredis": "^1.11.1"
+    "ioredis": "^1.11.1",
+    "sqlite3": "^3.1.1"
   }
 }

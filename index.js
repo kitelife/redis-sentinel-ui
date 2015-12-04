@@ -2,6 +2,10 @@
 
 var http = require('http');
 var urlParser = require('url');
+var childProcess = require('child_process');
+
+var monitorProcess = childProcess.fork('./monitor.js');
+monitorProcess.on('exit', function(code, signal) {});
 
 function router(req, res) {
   var urlParts = urlParser.parse(req.url);
