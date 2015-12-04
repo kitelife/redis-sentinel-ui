@@ -34,7 +34,7 @@ var storage = {
     },
     // 从数据库中随便获取一个可用sentinel的地址
     getActiveSentinel: function (callback) {
-        this.connection.get('SELECT sentinel FROM `sentinels` WHERE status="ON" LIMIT 1', callback);
+        this.connection.get('SELECT sentinel FROM `sentinels` WHERE status="ON"', callback);
     }
 };
 

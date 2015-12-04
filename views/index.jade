@@ -7,10 +7,26 @@ html(lang="en")
         meta(charset='utf-8')
         meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1")
-        title Redis Sentinel管理工具
+        title Redis Sentinel UI
         link(rel='stylesheet', href='/assets/bootstrap/css/bootstrap.min.css')
         link(rel='stylesheet', href='/assets/main.css')
     body
-        div
-            p #{hello}
+        div(class="container")
+            nav(class=["navbar", "navbar-inverse"])
+                div(class="container-fluid")
+                    div(class="navbar-header")
+                        a(class="navbar-brand", href="#") Redis Sentinel UI
+            h3 Sentinel服务器
+            each sentinel in sentinels
+                div(class=['panel', 'panel-info'])
+                    div(class="panel-heading") #{sentinel.address}
+                    div(class="panel-body")
+            h3 Redis服务器
+            each redis in redises
+                - var isMaster = redis.role === 'master'
+                div(class=['panel', 'panel-success'])
+                    div(class="panel-heading")
+                        span #{redis.address}
+                        label(class=isMaster ? "label label-primary" : "label label-info") #{redis.role}
+                    div(class="panel-body")
         script(src='/assets/build/main.js')

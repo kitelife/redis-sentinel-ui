@@ -27,7 +27,7 @@ var configuration = {
         }
     ],
     master_name: "mymaster",
-    auth: "1qazxsw2",
+    auth: "",
     storage_file: "./rsm.db",
     sentinel_status_interval: 5000,
     cluster_info_interval: 10000,

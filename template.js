@@ -17,7 +17,6 @@ function render(relativePath, data) {
     return templateCache[filePath](data);
 }
 
-
 module.exports = {
     render: render
 };

@@ -46,24 +46,53 @@ function parseSentinelSingle(result) {
 function parseSentinelMulti(result) {
     var length = result.length;
 
-    var multiMapper = [];
+    var multiMapper = {};
     for (var index = 0; index < length; index++) {
-        multiMapper.push(parseSentinelSingle(result[index]));
+        var parsedResult = parseSentinelSingle(result[index]);
+        var serverAddr = parsedResult.ip + ':' + parsedResult.port;
+        multiMapper[serverAddr] = parsedResult;
     }
     return multiMapper;
 }
 
-function connAndInfo(host, port, role) {
+// 解析info命令的响应
+function parseInfoResp(resp) {
+    var mapper = {};
+    resp.forEach(function(ele, index, arr) {
+        if (ele.indexOf(':') === -1) return;
+
+        var lineParts = ele.split(':');
+        mapper[lineParts[0]] = lineParts[1];
+    });
+    return mapper;
+}
+
+function mergeObject(first, second) {
+    if (!first) {
+        first = {};
+    }
+    Object.getOwnPropertyNames(second).forEach(function(ele, index, arr) {
+        first[ele] = second[ele];
+    });
+    return first;
+}
+
+function connAndInfo(host, port, group) {
     var redisServer = new Redis({
         host: host,
         port: port,
         password: config.auth
     });
-    RedisServers[host + ':' + port] = redisServer;
-    redisServer.info().then(function(result) {
-        console.log(role + ': ');
-        console.log(result);
+
+    redisServer.info().then(function(resp) {
+        var parsedResp = parseInfoResp(resp.split('\r\n'));
+        var addr = host + ':' + port;
+        ClusterInfo[group][addr] = mergeObject(ClusterInfo[group][addr], parsedResp);
     });
+
+    if (group !== 'Sentinels') {
+        RedisServers[host + ':' + port] = redisServer;
+    }
 }
 
 // 获取集群的信息(包含当前主Redis的信息, 所有从Redis的信息, 以及所有Sentinel的信息)
@@ -73,7 +102,6 @@ function fetchClusterInfo() {
             console.error(err);
             return;
         }
-
         if (!result) {
             console.log('Null Redis');
             return;
@@ -92,7 +120,7 @@ function fetchClusterInfo() {
             ClusterInfo.Master = parseSentinelSingle(result);
 
             // 创建到主Redis的连接,并查询其基本信息
-            connAndInfo(ClusterInfo.Master.ip, ClusterInfo.Master.port, 'master');
+            connAndInfo(ClusterInfo.Master.ip, ClusterInfo.Master.port, 'Master');
         });
         sentinelInstance.sentinel('slaves', config.master_name, function (err, result) {
             if (err) {
@@ -102,8 +130,10 @@ function fetchClusterInfo() {
             ClusterInfo.Slaves = parseSentinelMulti(result);
 
             // 创建到从Redis的连接并查询其信息
-            ClusterInfo.Slaves.forEach(function(ele, index, arr) {
-                connAndInfo(ele.ip, ele.port, 'slave');
+            var slaves = ClusterInfo.Slaves;
+            Object.getOwnPropertyNames(slaves).forEach(function(ele, index, arr) {
+                var slave = slaves[ele];
+                connAndInfo(slave.ip, slave.port, 'Slaves');
             });
         });
         sentinelInstance.sentinel('sentinels', config.master_name, function (err, result) {
@@ -113,6 +143,12 @@ function fetchClusterInfo() {
             }
 
             ClusterInfo.Sentinels = parseSentinelMulti(result);
+
+            var sentinels = ClusterInfo.Sentinels;
+            Object.getOwnPropertyNames(sentinels).forEach(function(ele, index, arr) {
+                var sentinel = sentinels[ele];
+                connAndInfo(sentinel.ip, sentinel.port, 'Sentinels');
+            });
         });
     })
 }
@@ -140,7 +176,7 @@ function updateSentinelStatus() {
 }
 
 function collectServerInfo() {
-    var servers = RedisServers.keys();
+    var servers = Object.getOwnPropertyNames(RedisServers);
     if (servers.length === 0) {
         return;
     }
@@ -149,9 +185,18 @@ function collectServerInfo() {
     });
 }
 
+function getClusterInfo() {
+
+}
+
 module.exports = {
     fetch_cluster_status: fetchClusterInfo,
     update_sentinel_status: updateSentinelStatus,
     collect_server_info: collectServerInfo,
-    cluster_info: ClusterInfo
+    ActiveServer: new Redis({
+        sentinels: config.sentinels,
+        name: 'mymaster',
+        password: config.auth
+    }),
+    getClusterInfo: getClusterInfo
 };
