@@ -16,6 +16,9 @@ monitorProcess.on('exit', function (code, signal) {
 /**
  * Create HTTP server and listen it.
  */
+
+global.RootDir = __dirname;
+
 var server = http.createServer(routes);
 
 server.listen(config.port, function (req, res) {

@@ -7,6 +7,8 @@
 
 'use strict';
 
+var fs = require('fs');
+var path = require('path');
 var urlParser = require('url');
 var controllers = require('./controllers');
 
@@ -24,6 +26,22 @@ function router(req, res) {
     if (routes.hasOwnProperty(pathname)) {
         routes[pathname](req, res);
         return;
+    }
+
+    // 尝试处理静态文件请求
+    if (pathname.indexOf('/assets') === 0) {
+        var filePath = path.join(global.RootDir, pathname);
+        if (fs.existsSync(filePath)) {
+            fs.readFile(filePath, function(err, data) {
+                if (err) {
+                    res.statusCode = 500;
+                } else {
+                    res.write(data);
+                }
+                res.end();
+            });
+            return;
+        }
     }
 
     res.statusCode = 404;
