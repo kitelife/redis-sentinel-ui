@@ -51,6 +51,19 @@ function parseSentinelMulti(result) {
     return multiMapper;
 }
 
+var connAndInfo = function(host, port, role) {
+    var redisServer = new Redis({
+        host: host,
+        port: port,
+        password: config.auth
+    });
+    RedisServers[host + ':' + port] = redisServer;
+    redisServer.info().then(function(result) {
+        console.log(role + ': ');
+        console.log(result);
+    });
+};
+
 // 获取集群的信息(包含当前主Redis的信息, 所有从Redis的信息, 以及所有Sentinel的信息)
 function fetchClusterInfo() {
     Storage.getActiveSentinel(function(err, result) {
@@ -70,14 +83,21 @@ function fetchClusterInfo() {
                 return;
             }
             global.Master = parseSentinelSingle(result);
+
+            // 创建到主Redis的连接,并查询其基本信息
+            connAndInfo(global.Master.ip, global.Master.port, 'master');
         });
         sentinelInstance.sentinel('slaves', config.master_name, function(err, result) {
             if (err) {
                 console.error(err);
                 return;
             }
-
             global.Slaves = parseSentinelMulti(result);
+
+            // 创建到从Redis的连接并查询其信息
+            global.Slaves.forEach(function(ele, index, arr) {
+                connAndInfo(ele.ip, ele.port, 'slave');
+            });
         });
         sentinelInstance.sentinel('sentinels', config.master_name, function(err, result) {
             if (err) {
