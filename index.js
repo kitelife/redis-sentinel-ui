@@ -1,10 +1,10 @@
 'use strict';
 
 var http = require('http');
-var urlParser = require('url');
 var childProcess = require('child_process');
 
 var config = require('./config');
+var routes = require('./routes');
 
 // 后端监控进程
 var monitorProcess = childProcess.fork('./monitor.js');
@@ -13,17 +13,40 @@ monitorProcess.on('exit', function (code, signal) {
     console.log('monitor progress exit with code: ' + code + ', signal: ' + signal);
 });
 
-// Web服务
-function router(req, res) {
-    var urlParts = urlParser.parse(req.url);
-    if (urlParts.pathname === '/hello') {
-        res.write('world');
-        res.end();
-        return;
-    }
-    res.write(urlParts.pathname);
-    res.end();
-}
+/**
+ * Create HTTP server and listen it.
+ */
+var server = http.createServer(routes);
 
-var server = http.createServer(router);
-server.listen(config.port ? config.port : 8080);
+server.listen(config.port, function (req, res) {
+    console.log('Server start localhost@' + config.port);
+});
+
+server.on('error', onError);
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
