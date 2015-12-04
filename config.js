@@ -2,7 +2,10 @@
  * @file: config
  * @author: gejiawen
  * @date: 15/12/4 17:09
- * @description: config
+ * @description:
+ *
+ *  configuration
+ *
  */
 
 'use strict';
