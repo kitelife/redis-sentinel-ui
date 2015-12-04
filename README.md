@@ -1,0 +1,3 @@
+# Redis Sentinel Manager
+
+TBC.
