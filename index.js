@@ -13,7 +13,6 @@ monitorProcess.on('exit', function(code, signal) {});
 
 
 // Web服务
-
 var routes = {
     '/': controllers.index,
     '/cmd': controllers.cmd
@@ -22,13 +21,15 @@ var routes = {
 function router(req, res) {
     var urlParts = urlParser.parse(req.url),
         pathname = urlParts.pathname;
+
     if (routes.hasOwnProperty(pathname)) {
         routes[pathname](req, res);
-    } else {
-        res.statusCode = 404;
-        res.write('不存在目标资源!');
-        res.end();
+        return;
     }
+
+    res.statusCode = 404;
+    res.write('不存在目标资源!');
+    res.end();
 }
 
 var server = http.createServer(router);
