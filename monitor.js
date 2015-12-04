@@ -1,7 +1,7 @@
 'use strict';
 
 var RedisSentinel = require('./services/sentinel');
-var config = require('./config.json');
+var config = require('./config');
 
 // 先获取一下
 RedisSentinel.update_sentinel_status();

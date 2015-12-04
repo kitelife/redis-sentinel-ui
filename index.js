@@ -1,36 +1,52 @@
 'use strict';
 
 var http = require('http');
-var urlParser = require('url');
 var childProcess = require('child_process');
 
-var controllers = require('./controllers');
-var config = require('./config.json');
+var config = require('./config');
+var routes = require('./routes');
 
 // 后端监控进程
 var monitorProcess = childProcess.fork('./monitor.js');
-monitorProcess.on('exit', function(code, signal) {});
 
+monitorProcess.on('exit', function (code, signal) {
+    console.log('monitor progress exit with code: ' + code + ', signal: ' + signal);
+});
 
-// Web服务
-var routes = {
-    '/': controllers.index,
-    '/cmd': controllers.cmd
-};
+/**
+ * Create HTTP server and listen it.
+ */
+var server = http.createServer(routes);
 
-function router(req, res) {
-    var urlParts = urlParser.parse(req.url),
-        pathname = urlParts.pathname;
+server.listen(config.port, function (req, res) {
+    console.log('Server start localhost@' + config.port);
+});
 
-    if (routes.hasOwnProperty(pathname)) {
-        routes[pathname](req, res);
-        return;
+server.on('error', onError);
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
     }
 
-    res.statusCode = 404;
-    res.write('不存在目标资源!');
-    res.end();
-}
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
 
-var server = http.createServer(router);
-server.listen(config.port ? config.port : 8080);
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
