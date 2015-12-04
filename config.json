@@ -18,5 +18,6 @@
   "auth": "1qazxsw2",
   "storage_file": "./rsm.db",
   "sentinel_status_interval": 5000,
-  "cluster_info_interval": 10000
+  "cluster_info_interval": 10000,
+  "server_info": 5000
 }

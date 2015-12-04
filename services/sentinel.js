@@ -8,23 +8,50 @@ if (!Array.isArray(config.sentinels)) {
   console.error('请配置sentinel服务器');
 }
 
-var sentinels = [];
+// 存储Sentinel的连接对象
+var RedisSentinels = [];
 
 config.sentinels.forEach(function(ele, index, arr) {
     var oneSentinel = new Redis({
         host: ele.host ? ele.host : '127.0.0.1',
         port: ele.port ? ele.port : 26379
     });
-    sentinels.push(oneSentinel);
+    RedisSentinels.push(oneSentinel);
 });
 
-var redisConn = new Redis({
-  sentinels: config.sentinels,
-  name: config.master_name,
-  password: config.auth
-});
+// 存储Redis的连接对象
+var RedisServers = {};
 
-// 获取
+// 解析sentinel命令的结果
+
+function parseSentinelSingle(result) {
+    var endIndex = result.length - 1;
+    var index = 0;
+    var mapper = {};
+    var key, value;
+
+    while (index < endIndex) {
+        key = result[index];
+        value = result[index+1];
+        mapper[key] = value;
+
+        index += 2;
+    }
+
+    return mapper;
+}
+
+function parseSentinelMulti(result) {
+    var length = result.length;
+
+    var multiMapper = [];
+    for(var index=0; index < length; index++) {
+        multiMapper.push(parseSentinelSingle(result[index]));
+    }
+    return multiMapper;
+}
+
+// 获取集群的信息(包含当前主Redis的信息, 所有从Redis的信息, 以及所有Sentinel的信息)
 function fetchClusterInfo() {
     Storage.getActiveSentinel(function(err, result) {
         if (err) {
@@ -42,40 +69,52 @@ function fetchClusterInfo() {
                 console.error(err);
                 return;
             }
-            console.log(result);
+            global.Master = parseSentinelSingle(result);
         });
         sentinelInstance.sentinel('slaves', config.master_name, function(err, result) {
             if (err) {
                 console.error(err);
                 return;
             }
-            console.log(result);
+
+            global.Slaves = parseSentinelMulti(result);
         });
         sentinelInstance.sentinel('sentinels', config.master_name, function(err, result) {
             if (err) {
                 console.error(err);
                 return;
             }
-            console.log(result);
+
+            global.Sentinels = parseSentinelMulti(result);
         });
     })
 }
 
+// 检查所有sentinel是否可连, 并更新数据库中的状态
 function updateSentinelStatus() {
-    sentinels.forEach(function(ele, index, arr) {
+    RedisSentinels.forEach(function(ele, index, arr) {
         ele.ping().then(function (result) {
             var sentinelInfo = ele.options;
             var sentinelAddress = sentinelInfo.host + ':' + sentinelInfo.port;
             var sentinelStatus = result === 'PONG' ? 'ON' : 'OFF';
+
+            Storage.getSentinelPreviousStatus(sentinelAddress, function(err, result) {
+                if (result.status === 'OFF' && result.status !== sentinelStatus) {
+                    // 告警
+                }
+            });
 
             Storage.updateSentinelStatus(sentinelAddress, sentinelStatus);
         });
     });
 }
 
+function collectServerInfo() {
+
+}
+
 module.exports = {
-    sentinels: sentinels,
-    connection: redisConn,
     cluster_status: fetchClusterInfo,
-    sentinel_status: updateSentinelStatus
+    sentinel_status: updateSentinelStatus,
+    server_info: collectServerInfo
 };

@@ -24,6 +24,9 @@ var storage = {
             }
         );
     },
+    getSentinelPreviousStatus: function(sentinel_addr, callback) {
+        this.connection.get('SELECT status FROM `sentinels` WHERE sentinel=?', sentinel_addr, callback);
+    },
     getActiveSentinel: function(callback) {
         this.connection.get('SELECT sentinel FROM `sentinels` WHERE status="ON" LIMIT 1', callback);
     }
