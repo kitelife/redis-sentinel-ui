@@ -21,6 +21,8 @@ config.sentinels.forEach(function(ele, index, arr) {
 
 // 存储Redis的连接对象
 var RedisServers = {};
+// Sentinel集群信息
+var ClusterInfo = {};
 
 // 解析sentinel命令的结果
 
@@ -51,7 +53,7 @@ function parseSentinelMulti(result) {
     return multiMapper;
 }
 
-var connAndInfo = function(host, port, role) {
+function connAndInfo(host, port, role) {
     var redisServer = new Redis({
         host: host,
         port: port,
@@ -62,7 +64,7 @@ var connAndInfo = function(host, port, role) {
         console.log(role + ': ');
         console.log(result);
     });
-};
+}
 
 // 获取集群的信息(包含当前主Redis的信息, 所有从Redis的信息, 以及所有Sentinel的信息)
 function fetchClusterInfo() {
@@ -82,20 +84,20 @@ function fetchClusterInfo() {
                 console.error(err);
                 return;
             }
-            global.Master = parseSentinelSingle(result);
+            ClusterInfo.Master = parseSentinelSingle(result);
 
             // 创建到主Redis的连接,并查询其基本信息
-            connAndInfo(global.Master.ip, global.Master.port, 'master');
+            connAndInfo(ClusterInfo.Master.ip, ClusterInfo.Master.port, 'master');
         });
         sentinelInstance.sentinel('slaves', config.master_name, function(err, result) {
             if (err) {
                 console.error(err);
                 return;
             }
-            global.Slaves = parseSentinelMulti(result);
+            ClusterInfo.Slaves = parseSentinelMulti(result);
 
             // 创建到从Redis的连接并查询其信息
-            global.Slaves.forEach(function(ele, index, arr) {
+            ClusterInfo.Slaves.forEach(function(ele, index, arr) {
                 connAndInfo(ele.ip, ele.port, 'slave');
             });
         });
@@ -105,7 +107,7 @@ function fetchClusterInfo() {
                 return;
             }
 
-            global.Sentinels = parseSentinelMulti(result);
+            ClusterInfo.Sentinels = parseSentinelMulti(result);
         });
     })
 }
@@ -143,7 +145,8 @@ function collectServerInfo() {
 }
 
 module.exports = {
-    cluster_status: fetchClusterInfo,
-    sentinel_status: updateSentinelStatus,
-    server_info: collectServerInfo
+    fetch_cluster_status: fetchClusterInfo,
+    update_sentinel_status: updateSentinelStatus,
+    collect_server_info: collectServerInfo,
+    cluster_info: ClusterInfo
 };
