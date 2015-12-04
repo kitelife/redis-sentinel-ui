@@ -99,6 +99,9 @@ function updateSentinelStatus() {
             var sentinelStatus = result === 'PONG' ? 'ON' : 'OFF';
 
             Storage.getSentinelPreviousStatus(sentinelAddress, function(err, result) {
+                if (err || !result) {
+                    return;
+                }
                 if (result.status === 'OFF' && result.status !== sentinelStatus) {
                     // 告警
                 }
@@ -110,7 +113,13 @@ function updateSentinelStatus() {
 }
 
 function collectServerInfo() {
+    var servers = RedisServers.keys();
+    if (servers.length === 0) {
+        return;
+    }
+    servers.forEach(function(ele, index, arr) {
 
+    });
 }
 
 module.exports = {

@@ -3,6 +3,9 @@
 var RedisSentinel = require('./services/sentinel');
 var config = require('./config.json');
 
+// 先获取一下
+RedisSentinel.sentinel_status();
+
 setInterval(RedisSentinel.sentinel_status,
     config.sentinel_status_interval ? config.sentinel_status_interval : 5000);
 

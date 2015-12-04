@@ -13,6 +13,7 @@ db.run("CREATE TABLE IF NOT EXISTS sentinels (" +
     "sentinel TEXT NOT NULL UNIQUE," +
     "status TEXT NOT NULL DEFAULT 'OFF'" +
     ");");
+db.run('DELETE FROM sentinels');
 
 var storage = {
     connection: db,
