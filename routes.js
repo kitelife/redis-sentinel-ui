@@ -23,6 +23,7 @@ function router(req, res) {
     var urlParts = urlParser.parse(req.url),
         pathname = urlParts.pathname;
 
+    // 匹配路由表
     if (routes.hasOwnProperty(pathname)) {
         routes[pathname](req, res);
         return;
