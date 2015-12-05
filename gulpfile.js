@@ -10,9 +10,8 @@ const sourcemaps = require('gulp-sourcemaps');
 const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 
-
 gulp.task('babel', () => {
-    return gulp.src(['controllers/**/*.js', 'models/**/*.js'])
+    gulp.src(['controllers/**/*.js', 'models/**/*.js'])
         .pipe(sourcemaps.init())
         .pipe(babel({
             presets: ['es2015']
@@ -24,18 +23,17 @@ gulp.task('babel', () => {
 
 gulp.task('browserify', () => {
     // browserify编译
-    gulp.src('./assets/main.js')
+    gulp.src('./public/main.js')
         .pipe(browserify())
-        .pipe(gulp.dest('./assets/build'));
+        .pipe(gulp.dest('./public/dist'));
 });
 
 gulp.task('clone', () => {
     gulp.src([
             './node_modules/bootstrap/dist/css/**/*.*',
-            './node_modules/bootstrap/dist/fonts/**/*.*'], {base: './node_modules/bootstrap/dist'})
-        .pipe(gulp.dest('./assets/bootstrap'));
+            './node_modules/bootstrap/dist/fonts/**/*.*'
+        ], {base: './node_modules/bootstrap/dist'})
+        .pipe(gulp.dest('./public/vendors/bootstrap'));
 });
 
-gulp.task('default', [''],() => {
-    console.log('default task finished.');
-});
+gulp.task('default', ['browserify', 'clone']);

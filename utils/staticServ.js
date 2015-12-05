@@ -19,11 +19,12 @@ const path = require('path');
  */
 function _staticServ(pathname, callback) {
     if (pathname.indexOf('/public/') !== 0) {
-        callback(new Error('error static resource path prefix.'));
+        callback(new Error('404 Not Found'));
         return;
     }
 
     let filePath = path.join(global.RootDir, pathname);
+    console.log(pathname, filePath);
     let fileStat = fs.statSync(filePath);
 
     if (fileStat.isFile()) {
