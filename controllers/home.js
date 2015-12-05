@@ -1,20 +1,28 @@
 /**
- * Created by xiayf on 15/12/4.
+ * @file: home
+ * @author: gejiawen
+ * @date: 15/12/5 18:00
+ * @description: home
  */
 
 'use strict';
 
-var Template = require('./template');
-var Sentinel = require('./services/sentinel');
-var utils = require('./utils');
 
-function index(req, res) {
+const Sentinel = require('../models/sentinel');
+const Template = require('../utils/template');
+const Time = require('../utils/time');
 
-    var clusterInfo = Sentinel.ClusterInfo();
-    console.log(clusterInfo);
-
+/**
+ * `/home`控制器
+ * @param req
+ * @param res
+ * @private
+ */
+function _home(req, res) {
+    var clusterInfo = Sentinel.getClusterInfo();
     var allSentinel = [];
     var redisSentinels = clusterInfo.Sentinels;
+
     if (redisSentinels) {
         Object.getOwnPropertyNames(redisSentinels).forEach(function(ele, index, arr) {
             var thisSentinel = redisSentinels[ele];
@@ -47,7 +55,7 @@ function index(req, res) {
                 role: 'slave',
                 version: thisSlave.redis_version,
                 process_id: thisSlave.process_id,
-                uptime: utils.formatUpTime(thisSlave.uptime_in_seconds)
+                uptime: Time.formatUpTime(thisSlave.uptime_in_seconds)
             });
         });
     }
@@ -57,15 +65,12 @@ function index(req, res) {
         sentinels: allSentinel,
         redises: allRedis
     };
-    res.write(Template.render('views/index.jade', data));
+
+    res.write(Template.render('views/home.jade', data));
     res.end();
 }
 
-function cmd(req, res) {
-
-}
-
-module.exports = {
-    index: index,
-    cmd: cmd
-};
+/**
+ * Module Exports
+ */
+module.exports = _home;

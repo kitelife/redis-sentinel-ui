@@ -7,37 +7,28 @@ var config = require('./config');
 var routes = require('./routes');
 
 // 后端监控进程
-var monitorProcess = childProcess.fork('./monitor.js');
+var monitorProcess = childProcess.fork('./services/monitor');
 
 monitorProcess.on('exit', function (code, signal) {
     console.log('monitor progress exit with code: ' + code + ', signal: ' + signal);
 });
 
-/**
- * Create HTTP server and listen it.
- */
-
+// store global var
 global.RootDir = __dirname;
 
+// Create HTTP server and listen it.
 var server = http.createServer(routes);
 
 server.listen(config.port, function (req, res) {
     console.log('Server start localhost@' + config.port);
 });
 
-server.on('error', onError);
-
-/**
- * Event listener for HTTP server "error" event.
- */
-function onError(error) {
+server.on('error', function (error) {
     if (error.syscall !== 'listen') {
         throw error;
     }
 
-    var bind = typeof port === 'string'
-        ? 'Pipe ' + port
-        : 'Port ' + port;
+    var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
     // handle specific listen errors with friendly messages
     switch (error.code) {
@@ -52,4 +43,4 @@ function onError(error) {
         default:
             throw error;
     }
-}
+});

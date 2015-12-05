@@ -1,0 +1,22 @@
+//-
+   @file: home
+   @author: gejiawen
+   @date: 15/12/5 19:15
+   @description: home
+
+extends layout
+
+block content
+    h3 Sentinel服务器
+    each sentinel in sentinels
+        div(class=['panel', 'panel-info'])
+            div(class="panel-heading") #{sentinel.address}
+            div(class="panel-body")
+    h3 Redis服务器
+    each redis in redises
+        - var isMaster = redis.role === 'master'
+        div(class=['panel', 'panel-success'])
+            div(class="panel-heading")
+                span #{redis.address}
+                label(class=isMaster ? "label label-primary" : "label label-info") #{redis.role}
+            div(class="panel-body")

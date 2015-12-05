@@ -1,0 +1,23 @@
+//-
+   @file: layout
+   @author: gejiawen
+   @date: 15/12/5 19:14
+   @description: layout
+
+- var date = new Date()
+- title = 'Redis Sentinel Manager'
+
+doctype html
+
+html
+    head
+        title #{title}
+        link(rel='stylesheet', href='/public/normalize.css')
+        link(rel='stylesheet', href='/public/main.css')
+        script(src='/public/dist/main.js')
+        block head_css
+        block head_js
+    body
+        include header
+        block content
+        include footer
