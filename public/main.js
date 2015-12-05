@@ -5,4 +5,5 @@ var $ = jQuery = require('jquery');
 require('bootstrap');
 
 $(function() {
+
 });
