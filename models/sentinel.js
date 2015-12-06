@@ -251,6 +251,9 @@ var _activeServer = new Redis({
     password: config.auth
 });
 
+/**
+ * Module Exports
+ */
 module.exports = {
     fetch_cluster_status: _fetchClusterInfo,
     update_sentinel_status: _updateSentinelStatus,

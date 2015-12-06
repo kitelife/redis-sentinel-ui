@@ -8,6 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "youngsterxyf",
+  "contributors": [
+    "gejiawen <806717031@qq.com>"
+  ],
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^3.3.6",
@@ -24,7 +27,6 @@
     "gulp-babel": "^6.1.1",
     "gulp-browserify": "^0.5.1",
     "gulp-concat": "^2.6.0",
-    "gulp-sourcemaps": "^1.6.0",
-    "moment": "^2.10.6"
+    "gulp-sourcemaps": "^1.6.0"
   }
 }

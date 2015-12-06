@@ -48,8 +48,12 @@ function* _parseReqBody(req) {
 }
 
 function _router(req, res) {
-    var urlParts = urlParser.parse(req.url),
-        pathname = urlParts.pathname;
+    let urlParts = urlParser.parse(req.url);
+    let pathname = urlParts.pathname;
+
+    // 输出请求路径及方法
+    console.log(pathname, req.method);
+
     // 匹配路由表
     if ((pathname in routes) && (routes[pathname].verb.indexOf(req.method) != -1)) {
         // 绑定一些方法
@@ -61,7 +65,7 @@ function _router(req, res) {
             // 统一解析并保存请求体数据
             _parseReqBody(req).next().value.then(function(parsedBody) {
                 req.body = parsedBody;
-                console.log(req.body);
+                // console.log(req.body);
                 routes[pathname].action(req, res);
             });
         } else {

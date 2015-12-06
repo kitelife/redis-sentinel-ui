@@ -7,7 +7,7 @@
 
 'use strict';
 
-var StdUtil = require('util');
+const StdUtil = require('util');
 
 // const moment = require('moment');
 

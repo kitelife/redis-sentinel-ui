@@ -62,7 +62,7 @@ function _home(req, res) {
                 process_id: redisMaster.process_id,
                 uptime: Time.formatUpTime(redisMaster.uptime_in_seconds)
             });
-            console.log(allRedis);
+            // console.log(allRedis);
         }
         var redisSlaves = clusterInfo.slaves;
         if (redisSlaves) {
