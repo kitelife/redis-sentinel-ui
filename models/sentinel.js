@@ -234,8 +234,12 @@ function _collectServerInfo() {
     if (servers.length === 0) {
         return;
     }
-    servers.forEach(function (val, index, arr) {
-        // TODO
+    servers.forEach(server => {
+        RedisServers[server].info().then(resp => {
+            let parsedResp = _parseInfoResp(resp.split('\r\n'));
+            DB.addNewConnectedClient(server, parsedResp['connected_clients']);
+            DB.addNewUsedMemory(server, parsedResp['used_memory']);
+        });
     });
 }
 

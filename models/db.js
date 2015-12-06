@@ -42,6 +42,29 @@ db.run(create_clusterinfo_sql);
 db.run('DELETE FROM cluster_info');
 db.run('INSERT INTO `cluster_info` (`master_name`) VALUES (?)', config.master_name);
 
+var create_connected_client = `
+CREATE TABLE IF NOT EXISTS connected_client (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    server TEXT NOT NULL,
+    client_num INTEGER NOT NULL,
+    created_time NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+`;
+db.run(create_connected_client);
+// 手动添加个索引吧
+// CREATE INDEX connected_client_server_idx ON connected_client (server);
+
+var create_used_memory = `
+CREATE TABLE IF NOT EXISTS used_memory (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    server TEXT NOT NULL,
+    used_memory INTEGER NOT NULL,
+    created_time NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+`;
+db.run(create_used_memory);
+// 手动添加个索引吧
+// CREATE INDEX used_memory_server_idx ON used_memory (server);
 /**
  * 更新数据库中sentinel的状态
  *
@@ -99,6 +122,28 @@ function _getClusterInfo(callback) {
     );
 }
 
+function _addNewConnectedClient(server, clientNum) {
+    db.run('INSERT INTO `connected_client` (`server`, `client_num`) VALUES (?, ?)',
+        server, clientNum);
+}
+
+function _getRangeConnectedClient(server, beginTime, endTime, callback) {
+    db.all('SELECT client_num, created_time FROM `connected_client` ' +
+        'WHERE server=? AND created_time>=? AND created_time<=?',
+        server, beginTime, endTime, callback);
+}
+
+function _addNewUsedMemory(server, usedMemory) {
+    db.run('INSERT INTO `used_memory` (`server`, `used_memory`) VALUES (?, ?)',
+        server, usedMemory);
+}
+
+function _getRangeUsedMemory(server, beginTime, endTime, callback) {
+    db.all('SELECT used_memory, created_time FROM `used_memory` ' +
+        'WHERE server=? AND created_time>=? AND created_time<=?',
+        server, beginTime, endTime, callback);
+}
+
 /**
  * Module Exports
  */
@@ -107,3 +152,7 @@ exports.getPrev = _getSentinelPreviousStatus;
 exports.getActive = _getActiveSentinel;
 exports.saveClusterPart = _saveClusterPart;
 exports.getClusterInfo = _getClusterInfo;
+exports.addNewConnectedClient = _addNewConnectedClient;
+exports.getRangeConnectedClient = _getRangeConnectedClient;
+exports.addNewUsedMemory = _addNewUsedMemory;
+exports.getRangeConnectedClient = _getRangeUsedMemory;
