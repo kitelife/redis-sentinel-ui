@@ -30,9 +30,9 @@ var configuration = {
     master_name: 'mymaster',
     auth: null,
     storage_file: STORAGE_FILE_PATH,
-    sentinel_status_interval: 5000,
-    cluster_info_interval: 10000,
-    server_info: 5000
+    sentinel_status_interval: 30000,
+    cluster_info_interval: 120000,
+    server_stat: 5000
 };
 
 

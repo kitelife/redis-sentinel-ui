@@ -38,8 +38,6 @@ function _cmd(req, res) {
     });
 }
 
-
-
 /**
  * Module Exports
  */

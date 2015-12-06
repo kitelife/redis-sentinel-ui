@@ -15,14 +15,8 @@ var ValidRedisCMDs = require('ioredis/commands');
 var DB = require('./db');
 var config = require('../config');
 
-/**
- * TODO
- * 应该在启动时就做一些判断逻辑,而不是在具体的业务层代码做这些.
- */
-if (!config.sentinels.length) {
-    console.error('请配置sentinel服务器');
-}
-
+// 存储Sentinel状态
+var AllSentinelStatus = {};
 // 存储Sentinel的连接对象
 var RedisSentinels = [];
 // 存储Redis的连接对象
@@ -215,16 +209,14 @@ function _updateSentinelStatus() {
             let sentinelAddress = sentinelInfo.host + ':' + sentinelInfo.port;
             let sentinelStatus = result === 'PONG' ? 'ON' : 'OFF';
 
-            DB.getPrev(sentinelAddress, (err, result) => {
-                if (err || !result) {
-                    return;
-                }
-                if (result.status === 'OFF' && result.status !== sentinelStatus) {
-                    // TODO 告警
-                }
-            });
+            if ((sentinelAddress in AllSentinelStatus)
+                && (sentinelStatus !== AllSentinelStatus[sentinelAddress])
+                && sentinelStatus === 'OFF')  {
+                // TODO: 发送告警
+            }
 
-            DB.update(sentinelAddress, sentinelStatus);
+            AllSentinelStatus[sentinelAddress]  = sentinelStatus;
+            DB.updateSentinelStatus(sentinelAddress, sentinelStatus);
         });
     });
 }

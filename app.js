@@ -6,6 +6,11 @@ var childProcess = require('child_process');
 var config = require('./config');
 var routes = require('./routes');
 
+// 配置检查
+if (!config.sentinels.length) {
+    console.error('请配置sentinel服务器');
+}
+
 // 后端监控进程
 var monitorProcess = childProcess.fork('./services/monitor');
 

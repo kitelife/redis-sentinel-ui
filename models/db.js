@@ -42,33 +42,6 @@ db.run(create_clusterinfo_sql);
 db.run('DELETE FROM cluster_info');
 db.run('INSERT INTO `cluster_info` (`master_name`) VALUES (?)', config.master_name);
 
-/*
-var storage = {
-    connection: db,
-    // 更新数据库中sentinel的状态
-    updateSentinelStatus: (sentinel_addr, status, callback) => {
-        this.connection.run('REPLACE INTO `sentinels` (`sentinel`, `status`) VALUES (?, ?)',
-            sentinel_addr,
-            status,
-            callback
-        );
-    },
-    // 从数据库中获取某个sentinel的状态
-    getSentinelPreviousStatus: (sentinel_addr, callback) => {
-        this.connection.get('SELECT status FROM `sentinels` WHERE sentinel=?',
-            sentinel_addr,
-            callback
-        );
-    },
-    // 从数据库中随便获取一个可用sentinel的地址
-    getActiveSentinel: callback => {
-        this.connection.get('SELECT sentinel FROM `sentinels` WHERE status="ON"',
-            callback
-        );
-    }
-};
-*/
-
 /**
  * 更新数据库中sentinel的状态
  *
@@ -129,7 +102,7 @@ function _getClusterInfo(callback) {
 /**
  * Module Exports
  */
-exports.update = _updateSentinelStatus;
+exports.updateSentinelStatus = _updateSentinelStatus;
 exports.getPrev = _getSentinelPreviousStatus;
 exports.getActive = _getActiveSentinel;
 exports.saveClusterPart = _saveClusterPart;
