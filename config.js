@@ -28,7 +28,7 @@ var configuration = {
         }
     ],
     master_name: 'mymaster',
-    auth: '',
+    auth: null,
     storage_file: STORAGE_FILE_PATH,
     sentinel_status_interval: 5000,
     cluster_info_interval: 10000,

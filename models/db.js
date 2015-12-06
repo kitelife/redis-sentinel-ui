@@ -10,6 +10,8 @@
 
 'use strict';
 
+var StdUtil = require('util');
+
 var config = require('../config');
 var sqlite3 = require('sqlite3').verbose();
 
@@ -18,15 +20,26 @@ var db = new sqlite3.Database(config.storage_file);
 /**
  * 初始化sqlite数据表
  */
-var create_sql_str = `
+var create_sentinels_sql = `
     CREATE TABLE IF NOT EXISTS sentinels (
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         sentinel TEXT NOT NULL UNIQUE,
         status TEXT NOT NULL DEFAULT 'OFF'
     );
 `;
-db.run(create_sql_str);
+db.run(create_sentinels_sql);
 db.run('DELETE FROM sentinels');
+
+var create_clusterinfo_sql = `
+    CREATE TABLE IF NOT EXISTS cluster_info (
+        master_name TEXT NOT NULL UNIQUE,
+        master TEXT NOT NULL DEFAULT '{}',
+        slaves TEXT NOT NULL DEFAULT '[]',
+        sentinels TEXT NOT NULL DEFAULT '[]'
+    )
+`;
+db.run(create_clusterinfo_sql);
+db.run('DELETE FROM cluster_info');
 
 /*
 var storage = {
@@ -98,9 +111,26 @@ function _getActiveSentinel(callback) {
 }
 
 
+function _saveClusterPart(partData, partName) {
+    partData = JSON.stringify(partData);
+    var masterName = config.master_name;
+    var sql = StdUtil.format('REPLACE INTO `cluster_info` (`master_name`, `%s`) VALUES (?, ?)', partName);
+
+    db.run(sql, masterName, partData);
+}
+
+function _getClusterInfo(callback) {
+    var masterName = config.master_name;
+    db.get('SELECT * FROM `cluster_info` WHERE master_name=?',
+        masterName, callback
+    );
+}
+
 /**
  * Module Exports
  */
 exports.update = _updateSentinelStatus;
 exports.getPrev = _getSentinelPreviousStatus;
 exports.getActive = _getActiveSentinel;
+exports.saveClusterPart = _saveClusterPart;
+exports.getClusterInfo = _getClusterInfo;

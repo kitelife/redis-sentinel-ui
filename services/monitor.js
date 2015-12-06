@@ -7,5 +7,5 @@ var config = require('../config');
 RedisSentinel.update_sentinel_status();
 RedisSentinel.fetch_cluster_status();
 
-// setInterval(RedisSentinel.update_sentinel_status, config.sentinel_status_interval);
-// setInterval(RedisSentinel.fetch_cluster_status, config.cluster_info_interval);
+setInterval(RedisSentinel.update_sentinel_status, config.sentinel_status_interval);
+setInterval(RedisSentinel.fetch_cluster_status, config.cluster_info_interval);

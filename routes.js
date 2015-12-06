@@ -8,7 +8,6 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 const urlParser = require('url');
 
 const controllers = require('./controllers');

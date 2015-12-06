@@ -26,7 +26,11 @@ var RedisSentinels = [];
 // 存储Redis的连接对象
 var RedisServers = {};
 // Sentinel集群信息
-var ClusterInfo = {};
+var ClusterInfo = {
+    master: null,
+    slaves: null,
+    sentinels: null
+};
 
 config.sentinels.forEach(val => {
     RedisSentinels.push(new Redis({
@@ -114,7 +118,7 @@ function _connAndInfo(host, port, group) {
     var redisServer = new Redis({
         host: host,
         port: port,
-        password: config.auth
+        password: group === 'sentinels' ? null : config.auth
     });
 
     redisServer.info().then(resp => {
@@ -122,9 +126,11 @@ function _connAndInfo(host, port, group) {
         let addr = host + ':' + port;
 
         ClusterInfo[group][addr] = _mergeObject(ClusterInfo[group][addr], parsedResp);
+        // 同步到数据库
+        DB.saveClusterPart(ClusterInfo[group], group);
     });
 
-    if (group !== 'Sentinels') {
+    if (group !== 'sentinels') {
         RedisServers[host + ':' + port] = redisServer;
     }
 }
@@ -156,12 +162,12 @@ function _fetchClusterInfo() {
                 console.error(err);
                 return;
             }
-            ClusterInfo.Master = _parseSentinelSingle(result);
+            ClusterInfo.master = _parseSentinelSingle(result);
 
             /**
              * 创建到主Redis的连接,并查询其基本信息
              */
-            _connAndInfo(ClusterInfo.Master.ip, ClusterInfo.Master.port, 'Master');
+            _connAndInfo(ClusterInfo.master.ip, ClusterInfo.master.port, 'master');
         });
 
         sentinelInstance.sentinel('slaves', config.master_name, (err, result) => {
@@ -169,12 +175,12 @@ function _fetchClusterInfo() {
                 console.error(err);
                 return;
             }
-            ClusterInfo.Slaves = _parseSentinelMulti(result);
+            ClusterInfo.slaves = _parseSentinelMulti(result);
 
             // 创建到从Redis的连接并查询其信息
-            Object.getOwnPropertyNames(ClusterInfo.Slaves).forEach(val => {
-                let slave = slaves[val];
-                _connAndInfo(slave.ip, slave.port, 'Slaves');
+            Object.getOwnPropertyNames(ClusterInfo.slaves).forEach(val => {
+                let slave = ClusterInfo.slaves[val];
+                _connAndInfo(slave.ip, slave.port, 'slaves');
             });
         });
 
@@ -184,11 +190,11 @@ function _fetchClusterInfo() {
                 return;
             }
 
-            ClusterInfo.Sentinels = _parseSentinelMulti(result);
+            ClusterInfo.sentinels = _parseSentinelMulti(result);
 
-            Object.getOwnPropertyNames(ClusterInfo.Sentinels).forEach(val => {
-                let sentinel = sentinels[val];
-                _connAndInfo(sentinel.ip, sentinel.port, 'Sentinels');
+            Object.getOwnPropertyNames(ClusterInfo.sentinels).forEach(val => {
+                let sentinel = ClusterInfo.sentinels[val];
+                _connAndInfo(sentinel.ip, sentinel.port, 'sentinels');
             });
         });
     });
@@ -230,14 +236,6 @@ function _collectServerInfo() {
     });
 }
 
-/**
- *
- * @private
- */
-function _getClusterInfo() {
-    return ClusterInfo;
-}
-
 module.exports = {
     fetch_cluster_status: _fetchClusterInfo,
     update_sentinel_status: _updateSentinelStatus,
@@ -246,7 +244,6 @@ module.exports = {
         sentinels: config.sentinels,
         name: 'mymaster',
         password: config.auth
-    }),
-    getClusterInfo: _getClusterInfo
+    })
 };
 
