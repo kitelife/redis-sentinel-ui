@@ -15,6 +15,7 @@ const Parser = require('co-body');
 
 const controllers = require('./controllers');
 const StaticServ = require('./utils/staticServ');
+const RespUtil = require('./utils/resp');
 
 // Web路由
 const routes = {
@@ -51,6 +52,8 @@ function _router(req, res) {
         pathname = urlParts.pathname;
     // 匹配路由表
     if ((pathname in routes) && (routes[pathname].verb.indexOf(req.method) != -1)) {
+        // 绑定一些方法
+        res.toResponse = RespUtil.toRespone;
         // 统一解析保存URL查询字符串的请求参数
         req.query = qs.parse(urlParts.query);
 

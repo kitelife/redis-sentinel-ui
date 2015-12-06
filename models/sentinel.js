@@ -10,6 +10,8 @@
 'use strict';
 
 var Redis = require('ioredis');
+var ValidRedisCMDs = require('ioredis/commands');
+
 var DB = require('./db');
 var config = require('../config');
 
@@ -241,6 +243,12 @@ function _collectServerInfo() {
     });
 }
 
+// 检测 命令 是否有效
+function _isValidCommand(cmd) {
+    cmd = cmd.toLowerCase();
+    return !!(cmd in ValidRedisCMDs);
+}
+
 module.exports = {
     fetch_cluster_status: _fetchClusterInfo,
     update_sentinel_status: _updateSentinelStatus,
@@ -249,6 +257,7 @@ module.exports = {
         sentinels: config.sentinels,
         name: 'mymaster',
         password: config.auth
-    })
+    }),
+    isValidCommand: _isValidCommand
 };
 
