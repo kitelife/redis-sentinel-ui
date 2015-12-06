@@ -1,6 +1,6 @@
 /**
  * @file: sentinel
- * @author: gejiawen
+ * @author: youngsterxyf, gejiawen
  * @date: 15/12/5 17:13
  * @description:
  *
@@ -142,61 +142,65 @@ function _connAndInfo(host, port, group) {
  * @private
  */
 function _fetchClusterInfo() {
-    DB.getActive((err, result) => {
+    var activeSentinel = null;
+
+    var sentinelAddrs = Object.getOwnPropertyNames(AllSentinelStatus),
+        sentinelNum = sentinelAddrs.length,
+        sentinelIndex = 0;
+    while(sentinelIndex < sentinelNum) {
+        if (AllSentinelStatus[sentinelAddrs[sentinelIndex]] === 'ON') {
+            activeSentinel = sentinelAddrs[sentinelIndex];
+            break;
+        }
+        sentinelIndex++;
+    }
+    if (activeSentinel === null) {
+        console.error('Now has no active sentinel');
+        return;
+    }
+
+    var sentinelInfo = activeSentinel.split(':');
+    var sentinelInstance = new Redis({
+        host: sentinelInfo[0],
+        port: sentinelInfo[1]
+    });
+
+    sentinelInstance.sentinel('master', config.master_name, (err, result) => {
         if (err) {
             console.error(err);
             return;
         }
-        if (!result) {
-            console.error('None active redis sentinel.');
+        ClusterInfo.master = _parseSentinelSingle(result);
+
+        /**
+         * 创建到主Redis的连接,并查询其基本信息
+         */
+        _connAndInfo(ClusterInfo.master.ip, ClusterInfo.master.port, 'master');
+    });
+
+    sentinelInstance.sentinel('slaves', config.master_name, (err, result) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        ClusterInfo.slaves = _parseSentinelMulti(result);
+        // 创建到从Redis的连接并查询其信息
+        Object.getOwnPropertyNames(ClusterInfo.slaves).forEach(val => {
+            let slave = ClusterInfo.slaves[val];
+            _connAndInfo(slave.ip, slave.port, 'slaves');
+        });
+    });
+
+    sentinelInstance.sentinel('sentinels', config.master_name, (err, result) => {
+        if (err) {
+            console.error(err);
             return;
         }
 
-        var sentinelInfo = result.sentinel.split(':');
-        var sentinelInstance = new Redis({
-            host: sentinelInfo[0],
-            port: sentinelInfo[1]
-        });
-
-        sentinelInstance.sentinel('master', config.master_name, (err, result) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            ClusterInfo.master = _parseSentinelSingle(result);
-
-            /**
-             * 创建到主Redis的连接,并查询其基本信息
-             */
-            _connAndInfo(ClusterInfo.master.ip, ClusterInfo.master.port, 'master');
-        });
-
-        sentinelInstance.sentinel('slaves', config.master_name, (err, result) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            ClusterInfo.slaves = _parseSentinelMulti(result);
-
-            // 创建到从Redis的连接并查询其信息
-            Object.getOwnPropertyNames(ClusterInfo.slaves).forEach(val => {
-                let slave = ClusterInfo.slaves[val];
-                _connAndInfo(slave.ip, slave.port, 'slaves');
-            });
-        });
-
-        sentinelInstance.sentinel('sentinels', config.master_name, (err, result) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-
-            ClusterInfo.sentinels = _parseSentinelMulti(result);
-
-            Object.getOwnPropertyNames(ClusterInfo.sentinels).forEach(val => {
-                let sentinel = ClusterInfo.sentinels[val];
-                _connAndInfo(sentinel.ip, sentinel.port, 'sentinels');
-            });
+        ClusterInfo.sentinels = _parseSentinelMulti(result);
+        Object.getOwnPropertyNames(ClusterInfo.sentinels).forEach(val => {
+            let sentinel = ClusterInfo.sentinels[val];
+            _connAndInfo(sentinel.ip, sentinel.port, 'sentinels');
         });
     });
 }
