@@ -27,14 +27,8 @@ function _home(req, res) {
             return;
         }
 
-        console.log(result);
-
         if (!result) {
-            result = {
-                master: '{}',
-                slaves: '{}',
-                sentinels: '{}'
-            };
+            result = {master: '{}', slaves: '{}', sentinels: '{}'};
         }
 
         var clusterInfo = {
