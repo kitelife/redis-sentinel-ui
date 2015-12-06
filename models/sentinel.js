@@ -125,7 +125,12 @@ function _connAndInfo(host, port, group) {
         let parsedResp = _parseInfoResp(resp.split('\r\n'));
         let addr = host + ':' + port;
 
-        ClusterInfo[group][addr] = _mergeObject(ClusterInfo[group][addr], parsedResp);
+        if (group === 'master') {
+            ClusterInfo[group] = _mergeObject(ClusterInfo[group], parsedResp);
+        } else {
+            ClusterInfo[group][addr] = _mergeObject(ClusterInfo[group][addr], parsedResp);
+        }
+
         // 同步到数据库
         DB.saveClusterPart(ClusterInfo[group], group);
     });

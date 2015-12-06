@@ -43,28 +43,6 @@ function _router(req, res) {
         }
         res.end();
     });
-
-
-
-    // 尝试处理静态文件请求
-    //if (pathname.indexOf('/public') === 0) {
-    //    var filePath = path.join(global.RootDir, pathname);
-    //    if (fs.existsSync(filePath)) {
-    //        fs.readFile(filePath, function(err, data) {
-    //            if (err) {
-    //                res.statusCode = 500;
-    //            } else {
-    //                res.write(data);
-    //            }
-    //            res.end();
-    //        });
-    //        return;
-    //    }
-    //}
-    //
-    //res.statusCode = 404;
-    //res.write('不存在目标资源!');
-    //res.end();
 }
 
 

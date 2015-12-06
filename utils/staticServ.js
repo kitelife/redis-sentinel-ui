@@ -24,7 +24,6 @@ function _staticServ(pathname, callback) {
     }
 
     let filePath = path.join(global.RootDir, pathname);
-    console.log(pathname, filePath);
     let fileStat = fs.statSync(filePath);
 
     if (fileStat.isFile()) {
