@@ -15,8 +15,14 @@ const StaticServ = require('./utils/staticServ');
 
 // Web路由
 const routes = {
-    '/': controllers.Home,
-    '/cmd': controllers.Cmd
+    '/': {
+        'verb': ['GET'],
+        'action': controllers.Home
+    },
+    '/cmd': {
+        'verb': ['POST'],
+        'action': controllers.Cmd
+    }
 };
 
 function _router(req, res) {
@@ -24,8 +30,8 @@ function _router(req, res) {
         pathname = urlParts.pathname;
 
     // 匹配路由表
-    if (pathname in routes) {
-        routes[pathname](req, res);
+    if ((pathname in routes) && (routes[pathname].verb.indexOf(req.method) != -1)) {
+        routes[pathname].action(req, res);
         return;
     }
 
