@@ -22,12 +22,20 @@ function _cmd(req, res) {
      * 2. params: 命令参数, 多个参数以空格分隔
      */
     var cmd = req.body.cmd;
-    if (!Sentinel.isValidCommand(cmd)) {
+    if (! cmd || !Sentinel.isValidCommand(cmd)) {
         res.toResponse('参数cmd不合法!', 400);
         return;
     }
-    res.write(JSON.stringify(req.body));
-    res.end();
+    var params = req.body.params;
+    if (!params) {
+        res.toResponse('缺少必要的请求参数!', 400);
+        return;
+    }
+    params = params.split(' ');
+    var RedisServer = Sentinel.ActiveServer;
+    RedisServer[cmd.toLocaleLowerCase()].apply(RedisServer, params).then(function(result) {
+        res.toResponse(JSON.stringify(result));
+    });
 }
 
 

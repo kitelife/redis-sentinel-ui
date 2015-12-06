@@ -249,15 +249,17 @@ function _isValidCommand(cmd) {
     return !!(cmd in ValidRedisCMDs);
 }
 
+var _activeServer = new Redis({
+    sentinels: config.sentinels,
+    name: 'mymaster',
+    password: config.auth
+});
+
 module.exports = {
     fetch_cluster_status: _fetchClusterInfo,
     update_sentinel_status: _updateSentinelStatus,
     collect_server_info: _collectServerInfo,
-    ActiveServer: new Redis({
-        sentinels: config.sentinels,
-        name: 'mymaster',
-        password: config.auth
-    }),
+    ActiveServer: _activeServer,
     isValidCommand: _isValidCommand
 };
 
