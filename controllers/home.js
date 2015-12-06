@@ -32,8 +32,8 @@ function _home(req, res) {
         if (!result) {
             result = {
                 master: '{}',
-                slaves: '[]',
-                sentinels: '[]'
+                slaves: '{}',
+                sentinels: '{}'
             };
         }
 
@@ -41,7 +41,7 @@ function _home(req, res) {
             master: JSON.parse(result.master),
             slaves: JSON.parse(result.slaves),
             sentinels: JSON.parse(result.sentinels)
-        }
+        };
 
         var allSentinel = [];
         var redisSentinels = clusterInfo.sentinels;

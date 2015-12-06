@@ -34,12 +34,13 @@ var create_clusterinfo_sql = `
     CREATE TABLE IF NOT EXISTS cluster_info (
         master_name TEXT NOT NULL UNIQUE,
         master TEXT NOT NULL DEFAULT '{}',
-        slaves TEXT NOT NULL DEFAULT '[]',
-        sentinels TEXT NOT NULL DEFAULT '[]'
+        slaves TEXT NOT NULL DEFAULT '{}',
+        sentinels TEXT NOT NULL DEFAULT '{}'
     )
 `;
 db.run(create_clusterinfo_sql);
 db.run('DELETE FROM cluster_info');
+db.run('INSERT INTO `cluster_info` (`master_name`) VALUES (?)', config.master_name);
 
 /*
 var storage = {
@@ -114,14 +115,13 @@ function _getActiveSentinel(callback) {
 function _saveClusterPart(partData, partName) {
     partData = JSON.stringify(partData);
     var masterName = config.master_name;
-    var sql = StdUtil.format('REPLACE INTO `cluster_info` (`master_name`, `%s`) VALUES (?, ?)', partName);
-
-    db.run(sql, masterName, partData);
+    var sql = StdUtil.format('UPDATE `cluster_info` SET `%s`=? WHERE `master_name`=?', partName);
+    db.run(sql, partData, masterName);
 }
 
 function _getClusterInfo(callback) {
     var masterName = config.master_name;
-    db.get('SELECT * FROM `cluster_info` WHERE master_name=?',
+    db.get('SELECT master, slaves, sentinels FROM `cluster_info` WHERE master_name=?',
         masterName, callback
     );
 }
