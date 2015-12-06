@@ -14,7 +14,8 @@
  * @private
  */
 function _cmd(req, res) {
-    res.send('got cmd!');
+    res.write('_cmd');
+    res.end();
 }
 
 

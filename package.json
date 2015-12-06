@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^3.3.6",
+    "co-body": "^4.0.0",
     "ioredis": "^1.11.1",
     "jade": "^1.11.0",
     "jquery": "^2.1.4",
