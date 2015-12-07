@@ -73,7 +73,7 @@ function _stat(req, res) {
             res.toResponse(JSON.stringify([]));
             return;
         }
-        res.toResponse(result);
+        res.toResponse(JSON.stringify(result));
     });
 }
 

@@ -128,7 +128,7 @@ function _addNewConnectedClient(server, clientNum) {
 }
 
 function _getRangeConnectedClient(server, beginTime, endTime, callback) {
-    db.all('SELECT client_num, created_time FROM `connected_client` ' +
+    db.all('SELECT client_num AS value, created_time FROM `connected_client` ' +
         'WHERE server=? AND created_time>=? AND created_time<=?',
         server, beginTime, endTime, callback);
 }
@@ -139,7 +139,7 @@ function _addNewUsedMemory(server, usedMemory) {
 }
 
 function _getRangeUsedMemory(server, beginTime, endTime, callback) {
-    db.all('SELECT used_memory, created_time FROM `used_memory` ' +
+    db.all('SELECT used_memory AS value, created_time FROM `used_memory` ' +
         'WHERE server=? AND created_time>=? AND created_time<=?',
         server, beginTime, endTime, callback);
 }
