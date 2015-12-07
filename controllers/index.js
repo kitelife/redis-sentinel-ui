@@ -9,3 +9,4 @@
 
 exports.Home = require('./home');
 exports.Cmd = require('./cmd');
+exports.Stat = require('./stat');

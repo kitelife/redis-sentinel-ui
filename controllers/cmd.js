@@ -22,7 +22,7 @@ function _cmd(req, res) {
      * 2. params: 命令参数, 多个参数以空格分隔
      */
     var cmd = req.body.cmd;
-    if (! cmd || !Sentinel.isValidCommand(cmd)) {
+    if (!cmd || !Sentinel.isValidCommand(cmd)) {
         res.toResponse('参数cmd不合法!', 400);
         return;
     }

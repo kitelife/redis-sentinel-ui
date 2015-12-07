@@ -7,7 +7,6 @@
 
 'use strict';
 
-
 const DB = require('../models/db');
 const Template = require('../utils/template');
 const Time = require('../utils/time');

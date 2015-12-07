@@ -155,4 +155,4 @@ exports.getClusterInfo = _getClusterInfo;
 exports.addNewConnectedClient = _addNewConnectedClient;
 exports.getRangeConnectedClient = _getRangeConnectedClient;
 exports.addNewUsedMemory = _addNewUsedMemory;
-exports.getRangeConnectedClient = _getRangeUsedMemory;
+exports.getRangeUsedMemory = _getRangeUsedMemory;
