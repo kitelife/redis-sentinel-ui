@@ -24,8 +24,12 @@ const routes = {
         'action': controllers.Home
     },
     '/cmd': {
-        'verb': ['POST', 'GET'],
+        'verb': ['POST'],
         'action': controllers.Cmd
+    },
+    '/stat': {
+        'verb': ['GET'],
+        'action': controllers.Stat
     }
 };
 
