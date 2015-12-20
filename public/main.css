@@ -1,1 +1,26 @@
+.navbar {
+  margin-top: 20px;
+}
 
+.navbar-header {
+  margin-top: 5px;
+  color: grey;
+  font-size: 20px;
+}
+
+.navbar-header>img {
+    display: inline-block;
+}
+
+.navbar-header>span {
+  margin-left: 10px;
+  color: #grey;
+}
+
+h3 {
+  text-align: center;
+}
+
+.form-horizontal>button {
+  float: right;
+}

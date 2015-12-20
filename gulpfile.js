@@ -33,7 +33,7 @@ gulp.task('clone', () => {
             './node_modules/bootstrap/dist/css/**/*.*',
             './node_modules/bootstrap/dist/fonts/**/*.*'
         ], {base: './node_modules/bootstrap/dist'})
-        .pipe(gulp.dest('./public/vendors/bootstrap'));
+        .pipe(gulp.dest('./public/vendor/bootstrap'));
 });
 
 gulp.task('default', ['browserify', 'clone']);
