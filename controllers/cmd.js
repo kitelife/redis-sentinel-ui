@@ -39,6 +39,8 @@ function _cmd(req, res) {
             result = cmdRespParser.infoRespParser(result.split('\r\n'));
         }
         res.toResponse(JSON.stringify(result, null, " "));
+    }, function(err) {
+        res.toResponse(JSON.stringify(err, null, " "));
     });
 }
 
