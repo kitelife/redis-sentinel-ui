@@ -14,6 +14,7 @@ var ValidRedisCMDs = require('ioredis/commands');
 
 var DB = require('./db');
 var config = require('../config');
+var cmdRespParser = require('../utils/cmdRespParser');
 
 // 存储Sentinel状态
 var AllSentinelStatus = {};
@@ -69,27 +70,6 @@ function _parseSentinelMulti(result) {
 }
 
 /**
- * 解析info命令的响应
- *
- * @param resp
- * @returns {{}}
- */
-function _parseInfoResp(resp) {
-    var mapper = {};
-
-    resp.forEach(val => {
-        if (val.indexOf(':') === -1) {
-            return;
-        }
-
-        let pairs = val.split(':');
-        mapper[pairs[0]] = pairs[1];
-    });
-
-    return mapper;
-}
-
-/**
  *
  * @param first
  * @param second
@@ -118,7 +98,7 @@ function _connAndInfo(host, port, group) {
     });
 
     redisServer.info().then(resp => {
-        let parsedResp = _parseInfoResp(resp.split('\r\n'));
+        let parsedResp = cmdRespParser.infoRespParser(resp.split('\r\n'));
         let addr = host + ':' + port;
 
         if (group === 'master') {
@@ -236,7 +216,7 @@ function _collectServerInfo() {
     }
     servers.forEach(server => {
         RedisServers[server].info().then(resp => {
-            let parsedResp = _parseInfoResp(resp.split('\r\n'));
+            let parsedResp = cmdRespParser.infoRespParser(resp.split('\r\n'));
             DB.addNewConnectedClient(server, parsedResp['connected_clients']);
             DB.addNewUsedMemory(server, parsedResp['used_memory']);
         });

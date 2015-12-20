@@ -10,7 +10,7 @@
 const path = require('path');
 const jade = require('jade');
 
-const templateCache = {};
+var templateCache = {};
 
 /**
  *
@@ -20,6 +20,7 @@ const templateCache = {};
  * @private
  */
 function _render(relativePath, data) {
+    templateCache = {};
     let filePath = path.join(global.RootDir, relativePath);
 
     if (!(filePath in templateCache)) {
