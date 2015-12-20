@@ -1,4 +1,4 @@
-# Redis Sentinel Manager
+# Redis Sentinel UI
 
 ## folder structure
 
