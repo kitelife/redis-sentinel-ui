@@ -37,7 +37,7 @@ $(function () {
                 "cmd": cmd,
                 "params": params
             },
-            dataType: "json"
+            dataType: "text"
         });
         req.done(function (resp) {
             resp = '<pre>' + resp + '</pre>';
@@ -86,7 +86,7 @@ $(function () {
 
                 $('#' + containerID).highcharts({
                     chart: {
-                        //type: 'spline'
+                        type: 'spline'
                     },
                     title: {
                         text: statTitleMapper[ele]

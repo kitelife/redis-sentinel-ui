@@ -92,6 +92,7 @@ function _stat(req, res) {
         Object.getOwnPropertyNames(targetSeriesData).forEach(server => {
           respData.push({
             name: server,
+              type: graphTypeMapper[statName],
             data: targetSeriesData[server]
           })
         });
