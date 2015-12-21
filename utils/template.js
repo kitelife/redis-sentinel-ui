@@ -20,7 +20,7 @@ var templateCache = {};
  * @private
  */
 function _render(relativePath, data) {
-    templateCache = {};
+    // templateCache = {};
     let filePath = path.join(global.RootDir, relativePath);
 
     if (!(filePath in templateCache)) {

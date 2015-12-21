@@ -64,7 +64,8 @@ function _home(req, res) {
                 pending_cmds: redisMaster["pending-commands"],
                 uptime: Time.formatUpTime(redisMaster.uptime_in_seconds),
                 used_memory_peak: redisMaster.used_memory_peak_human,
-                total_commands_processed: redisMaster.total_commands_processed
+                total_commands_processed: redisMaster.total_commands_processed,
+                rejected_connections: redisMaster.rejected_connections
             });
             // console.log(allRedis);
         }
@@ -81,7 +82,8 @@ function _home(req, res) {
                     pending_cmds: thisSlave["pending-commands"],
                     uptime: Time.formatUpTime(thisSlave.uptime_in_seconds),
                     used_memory_peak: thisSlave.used_memory_peak_human,
-                    total_commands_processed: thisSlave.total_commands_processed
+                    total_commands_processed: thisSlave.total_commands_processed,
+                    rejected_connections: thisSlave.rejected_connections
                 });
             });
         }
