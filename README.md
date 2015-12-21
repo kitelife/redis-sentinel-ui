@@ -1,18 +1,15 @@
 # Redis Sentinel UI
 
-## folder structure
+## 部署运行:
 
-```
-|-controllers  控制器层
-|-models  模型层
-|-services  服务层
-|-utils  工具集
-|-views  后端模板
-|-public  前端资源
-|-app.js  启动文件
-|-config.js  配置文件
-|-routes.js  路由表
-|-gulpfile.js  构建文件
-```
+1. `git clone https://github.com/youngsterxyf/redis-sentinel-ui.git`
+2. `cd redis-sentinel-ui & npm install`
+3. `gulp default`
+4. `node app.js`
 
+## 截图
 
+![rsm-main](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-main.png)
+![rsm-stat-1](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-stat-1.png)
+![rsm-stat-2](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-stat-2.png)
+![rsm-cmd](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-cmd.png)
