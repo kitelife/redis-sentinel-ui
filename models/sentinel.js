@@ -24,7 +24,7 @@ var AllSentinelStatus = {};
 // 存储Sentinel的连接对象
 var RedisSentinels = [];
 // 存储Redis的连接对象
-var RedisServers = {};
+var RedisServers = [];
 // Sentinel集群信息
 var ClusterInfo = {
     master: null,
@@ -112,10 +112,15 @@ function _connAndInfo(host, port, group) {
 
         // 同步到数据库
         DB.saveClusterPart(ClusterInfo[group], group);
+        //
+        redisServer.disconnect();
     });
 
     if (group !== 'sentinels') {
-        RedisServers[host + ':' + port] = redisServer;
+        var serverAddr = host + ':' + port;
+        if (RedisServers.indexOf(serverAddr) === -1) {
+            RedisServers.push(serverAddr);
+        }
     }
 }
 
@@ -130,7 +135,7 @@ function _fetchClusterInfo() {
     var sentinelAddrs = Object.getOwnPropertyNames(AllSentinelStatus),
         sentinelNum = sentinelAddrs.length,
         sentinelIndex = 0;
-    while(sentinelIndex < sentinelNum) {
+    while (sentinelIndex < sentinelNum) {
         if (AllSentinelStatus[sentinelAddrs[sentinelIndex]] === 'ON') {
             activeSentinel = sentinelAddrs[sentinelIndex];
             break;
@@ -142,11 +147,12 @@ function _fetchClusterInfo() {
         return;
     }
 
-    var sentinelInfo = activeSentinel.split(':');
-    var sentinelInstance = new Redis({
-        host: sentinelInfo[0],
-        port: sentinelInfo[1]
-    });
+    var sentinelInfo = activeSentinel.split(':'),
+        sentinelInstance = new Redis({
+            host: sentinelInfo[0],
+            port: sentinelInfo[1]
+        }),
+        countSign = 3;
 
     sentinelInstance.sentinel('master', config.master_name, (err, result) => {
         if (err) {
@@ -159,6 +165,12 @@ function _fetchClusterInfo() {
          * 创建到主Redis的连接,并查询其基本信息
          */
         _connAndInfo(ClusterInfo.master.ip, ClusterInfo.master.port, 'master');
+        //
+        if (countSign === 1) {
+            sentinelInstance.disconnect();
+        } else {
+            countSign -= 1;
+        }
     });
 
     sentinelInstance.sentinel('slaves', config.master_name, (err, result) => {
@@ -172,6 +184,12 @@ function _fetchClusterInfo() {
             let slave = ClusterInfo.slaves[val];
             _connAndInfo(slave.ip, slave.port, 'slaves');
         });
+        //
+        if (countSign === 1) {
+            sentinelInstance.disconnect();
+        } else {
+            countSign -= 1;
+        }
     });
 
     sentinelInstance.sentinel('sentinels', config.master_name, (err, result) => {
@@ -185,27 +203,38 @@ function _fetchClusterInfo() {
         //
         var otherSentinelAddrs = Object.getOwnPropertyNames(parsedResultNoMe);
         if (otherSentinelAddrs.length) {
-          var selectedAnotherSentinel = otherSentinelAddrs[0].split(':'),
-              anotherSentinelInstance = new Redis({host: selectedAnotherSentinel[0], port: selectedAnotherSentinel[1]});
+            var selectedAnotherSentinel = otherSentinelAddrs[0].split(':'),
+                anotherSentinelInstance = new Redis({
+                    host: selectedAnotherSentinel[0],
+                    port: selectedAnotherSentinel[1]
+                });
 
-          anotherSentinelInstance.sentinel('sentinels', config.master_name, (err, result) => {
-            if (err) {
-              console.error(err);
-              return;
-            }
+            anotherSentinelInstance.sentinel('sentinels', config.master_name, (err, result) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
 
-            ClusterInfo.sentinels = _mergeObject(parsedResultNoMe, _parseSentinelMulti(result));
+                ClusterInfo.sentinels = _mergeObject(parsedResultNoMe, _parseSentinelMulti(result));
+                Object.getOwnPropertyNames(ClusterInfo.sentinels).forEach(val => {
+                    let sentinel = ClusterInfo.sentinels[val];
+                    _connAndInfo(sentinel.ip, sentinel.port, 'sentinels');
+                });
+                //
+                anotherSentinelInstance.disconnect();
+            });
+        } else {
+            ClusterInfo.sentinels = parsedResultNoMe;
             Object.getOwnPropertyNames(ClusterInfo.sentinels).forEach(val => {
                 let sentinel = ClusterInfo.sentinels[val];
                 _connAndInfo(sentinel.ip, sentinel.port, 'sentinels');
             });
-          });
+        }
+        //
+        if (countSign === 1) {
+            sentinelInstance.disconnect();
         } else {
-          ClusterInfo.sentinels = parsedResultNoMe;
-          Object.getOwnPropertyNames(ClusterInfo.sentinels).forEach(val => {
-              let sentinel = ClusterInfo.sentinels[val];
-              _connAndInfo(sentinel.ip, sentinel.port, 'sentinels');
-          });
+            countSign -= 1;
         }
     });
 }
@@ -220,11 +249,11 @@ function _updateSentinelStatus() {
 
             if ((sentinelAddress in AllSentinelStatus)
                 && (sentinelStatus !== AllSentinelStatus[sentinelAddress])
-                && sentinelStatus === 'OFF')  {
+                && sentinelStatus === 'OFF') {
                 // TODO: 发送告警
             }
 
-            AllSentinelStatus[sentinelAddress]  = sentinelStatus;
+            AllSentinelStatus[sentinelAddress] = sentinelStatus;
             DB.updateSentinelStatus(sentinelAddress, sentinelStatus);
         });
     });
@@ -235,15 +264,20 @@ function _updateSentinelStatus() {
  * @private
  */
 function _collectServerInfo() {
-    var servers = Object.getOwnPropertyNames(RedisServers);
-    if (servers.length === 0) {
-        return;
-    }
-    servers.forEach(server => {
-        RedisServers[server].info().then(resp => {
+    RedisServers.forEach(addr => {
+        var ipPort = addr.split(':'),
+            newRedisConn = new Redis({
+                host: ipPort[0],
+                port: ipPort[1],
+                password: config.auth
+            });
+
+        newRedisConn.info().then(resp => {
             let parsedResp = cmdRespParser.infoRespParser(resp.split('\r\n'));
-            DB.addNewConnectedClient(server, parsedResp['connected_clients']);
-            DB.addNewUsedMemory(server, (parsedResp['used_memory']/oneM).toFixed(3));
+            DB.addNewConnectedClient(addr, parsedResp['connected_clients']);
+            DB.addNewUsedMemory(addr, (parsedResp['used_memory'] / oneM).toFixed(3));
+            //
+            newRedisConn.disconnect();
         });
     });
 }
