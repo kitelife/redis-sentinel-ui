@@ -7,8 +7,8 @@ var Highcharts = require('highcharts');
 Highcharts.setOptions({ global: { useUTC: false } });
 
 var statTitleMapper = {
-    'connected_client': '客户端连接数',
-    'used_memory': '内存使用量'
+    'connected_client': '客户端连接数(个)',
+    'used_memory': '内存使用量(MB)'
 };
 
 $(function () {
@@ -86,21 +86,13 @@ $(function () {
                 $('.stat-graph-part').append('<div id=' + containerID + '></div>');
 
                 $('#' + containerID).highcharts({
-                    chart: {
-                        type: 'spline'
+                    credits: {
+                      enabled: false
                     },
                     title: {
                         text: statTitleMapper[ele]
                     },
-                    xAxis: resp.xAxis ? resp.xAxis : {type: 'datetime'},
-                    yAxis: resp.yAxis ? resp.yAxis : {},
-                    plotOptions: resp.plotOptions ? resp.plotOptions : {
-                        spline: {
-                            marker: {
-                                enabled: false
-                            }
-                        }
-                    },
+                    xAxis: {type: 'datetime'},
                     series: resp
                 });
             });

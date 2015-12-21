@@ -12,8 +12,8 @@ const StatMapper = {
 };
 
 const graphTypeMapper = {
-  'connected_client': 'line',
-  'used_memory': 'area'
+    'connected_client': 'spline',
+    'used_memory': 'area'
 };
 
 function _checkStatName(statName) {
@@ -70,7 +70,7 @@ function _stat(req, res) {
         return;
     }
     targetServers = targetServers.split(',');
-    StatMapper[statName](targetServers, statBeginTime, statEndTime, function(err, result) {
+    StatMapper[statName](targetServers, statBeginTime, statEndTime, function (err, result) {
         if (err) {
             res.toResponse(err.message, 500);
             return;
@@ -86,15 +86,19 @@ function _stat(req, res) {
             if (!(record.server in targetSeriesData)) {
                 targetSeriesData[record.server] = [];
             }
-          targetSeriesData[record.server].push([Date.parse(record.created_time), record.value]);
+            targetSeriesData[record.server].push([Date.parse(record.created_time), record.value]);
         });
         var respData = [];
         Object.getOwnPropertyNames(targetSeriesData).forEach(server => {
-          respData.push({
-            name: server,
-              type: graphTypeMapper[statName],
-            data: targetSeriesData[server]
-          })
+            respData.push({
+                name: server,
+                type: graphTypeMapper[statName],
+                marker: {
+                    enabled: false
+                },
+                lineWidth: 1.5,
+                data: targetSeriesData[server]
+            })
         });
         res.toResponse(JSON.stringify(respData));
     });

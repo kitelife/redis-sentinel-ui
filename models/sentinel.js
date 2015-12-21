@@ -16,6 +16,9 @@ var DB = require('./db');
 var config = require('../config');
 var cmdRespParser = require('../utils/cmdRespParser');
 
+// 1M = 1024 * 1024;
+const oneM = 1048576;
+
 // 存储Sentinel状态
 var AllSentinelStatus = {};
 // 存储Sentinel的连接对象
@@ -240,7 +243,7 @@ function _collectServerInfo() {
         RedisServers[server].info().then(resp => {
             let parsedResp = cmdRespParser.infoRespParser(resp.split('\r\n'));
             DB.addNewConnectedClient(server, parsedResp['connected_clients']);
-            DB.addNewUsedMemory(server, parsedResp['used_memory']);
+            DB.addNewUsedMemory(server, (parsedResp['used_memory']/oneM).toFixed(3));
         });
     });
 }

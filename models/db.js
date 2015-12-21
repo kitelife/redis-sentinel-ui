@@ -58,7 +58,7 @@ var create_used_memory = `
 CREATE TABLE IF NOT EXISTS used_memory (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     server TEXT NOT NULL,
-    used_memory INTEGER NOT NULL,
+    used_memory REAL NOT NULL,
     created_time NOT NULL DEFAULT (datetime('now','localtime'))
 );
 `;
