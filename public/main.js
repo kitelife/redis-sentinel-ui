@@ -4,6 +4,7 @@
 var $ = jQuery = require('jquery');
 var _ = require('cn-bootstrap-datetimepicker');
 var Highcharts = require('highcharts');
+Highcharts.setOptions({ global: { useUTC: false } });
 
 var statTitleMapper = {
     'connected_client': '客户端连接数',

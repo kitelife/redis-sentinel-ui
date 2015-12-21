@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS connected_client (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     server TEXT NOT NULL,
     client_num INTEGER NOT NULL,
-    created_time NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_time NOT NULL DEFAULT (datetime('now','localtime'))
 );
 `;
 db.run(create_connected_client);
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS used_memory (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     server TEXT NOT NULL,
     used_memory INTEGER NOT NULL,
-    created_time NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_time NOT NULL DEFAULT (datetime('now','localtime'))
 );
 `;
 db.run(create_used_memory);
