@@ -10,3 +10,5 @@
 exports.Home = require('./home');
 exports.Cmd = require('./cmd');
 exports.Stat = require('./stat');
+exports.Cmd_page = require('./cmd_page');
+exports.Stat_page = require('./stat_page');

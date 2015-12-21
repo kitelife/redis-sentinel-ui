@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  h3 执行命令
+  div(class="container-fluid")
+    form(class="form-horizontal")
+      div(class="form-group")
+        input(type="text", class="form-control", placeholder="输入命令，参数以空格相隔", name="cmd")
+      button(type="submit", class=["btn", "btn-primary"], id="submit_cmd") 执行
+
+  div(class="clearfix")
+
+  h3 输出
+  div(id="cmd_output")

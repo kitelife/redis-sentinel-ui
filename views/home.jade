@@ -7,54 +7,58 @@
 extends layout
 
 block content
-    div(class="col-xs-6")
-      h3 Sentinel服务器
-      each sentinel in sentinels
-          div(class=['panel', 'panel-info'])
-            div(class="panel-heading") #{sentinel.address}
-            div(class="panel-body")
-              div(class="container-fluid")
-                div(class="row")
-                  div(class="col-md-6")
-                    label 版本
-                    ：#{sentinel.version}
-                  div(class="col-md-6")
-                    label 进程ID
-                    ：#{sentinel.process_id}
-                div(class="row")
-                  div(class="col-md-6")
-                    label 运行时长
-                    ：#{sentinel.uptime}
-      h3 Redis服务器
-      each redis in redises
-        - var isMaster = redis.role === 'master'
-        div(class=['panel', 'panel-success'])
-          div(class="panel-heading")
-              span #{redis.address}
-              label(class=isMaster ? "label label-primary" : "label label-info") #{redis.role}
-          div(class="panel-body")
-            div(class="container-fluid")
-              div(class="row")
-                div(class="col-md-6")
-                  label 版本
-                  ：#{redis.version}
-                div(class="col-md-6")
-                  label 进程ID
-                  ：#{redis.process_id}
-              div(class="row")
-                div(class="col-md-6")
-                  label 运行时长
-                  ：#{redis.uptime}
+  h3 Sentinel服务器
+  each sentinel in sentinels
+      div(class=['panel', 'panel-info'])
+        div(class="panel-heading") #{sentinel.address}
+        div(class="panel-body")
+          div(class="container-fluid")
+            div(class="row")
+              div(class="col-md-6")
+                label 版本：
+                span #{sentinel.version}
+              div(class="col-md-6")
+                label 进程ID：
+                span #{sentinel.process_id}
+            div(class="row")
+              div(class="col-md-6")
+                label 运行时长：
+                span #{sentinel.uptime}
+              div(class="col-md-6")
+                label 等待执行命令数：
+                span #{sentinel.pending_cmds}
 
-    div(class="col-xs-6")
-      h3 执行命令
-      form(class="form-horizontal")
-        div(class="form-group")
-          input(type="text", class="form-control", placeholder="输入命令，参数以空格相隔", name="cmd")
-        button(type="submit", class=["btn", "btn-primary"], id="submit_cmd") 执行
-
-      div(class="clearfix")
-
-      h3 输出
-      div(class=["panel", "panel-default"])
-        div(class="panel-body", id="cmd_output")
+  h3 Redis服务器
+  each redis in redises
+    - var isMaster = redis.role === 'master'
+    div(class=['panel', 'panel-success'])
+      div(class="panel-heading")
+          span #{redis.address}
+          label(class=isMaster ? "label label-primary" : "label label-info") #{redis.role}
+      div(class="panel-body")
+        div(class="container-fluid")
+          div(class="row")
+            div(class="col-md-6")
+              label 版本：
+              span #{redis.version}
+            div(class="col-md-6")
+              label 进程ID：
+              span #{redis.process_id}
+          div(class="row")
+            div(class="col-md-6")
+              label 运行时长：
+              span #{redis.uptime}
+            div(class="col-md-6")
+              label 内存占用：
+              span #{redis.used_memory}
+          div(class="row")
+            div(class="col-md-6")
+              label 等待执行命令数：
+              span #{redis.pending_cmds}
+            div(class="col-md-6")
+              label 内存占用峰值：
+              span #{redis.used_memory_peak}
+          div(class="row")
+            div(class="col-md-6")
+              label 已处理命令数：
+              span #{redis.total_commands_processed}

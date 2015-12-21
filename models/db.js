@@ -127,10 +127,23 @@ function _addNewConnectedClient(server, clientNum) {
         server, clientNum);
 }
 
-function _getRangeConnectedClient(server, beginTime, endTime, callback) {
-    db.all('SELECT client_num AS value, created_time FROM `connected_client` ' +
-        'WHERE server=? AND created_time>=? AND created_time<=?',
-        server, beginTime, endTime, callback);
+function _getRangeConnectedClient(servers, beginTime, endTime, callback) {
+    var serverCount = servers.length;
+
+    var sql = 'SELECT client_num AS value, server, created_time FROM `connected_client` WHERE server IN (?';
+    while (serverCount > 1) {
+      sql = sql + ', ?';
+      serverCount = serverCount - 1;
+    }
+    sql += ') AND created_time>=? AND created_time<=? ORDER BY created_time';
+
+    var stmtParams = servers;
+    stmtParams.push(beginTime);
+    stmtParams.push(endTime);
+    stmtParams.push(callback);
+    stmtParams.unshift(sql);
+
+    db.all.apply(db, stmtParams);
 }
 
 function _addNewUsedMemory(server, usedMemory) {
@@ -138,10 +151,23 @@ function _addNewUsedMemory(server, usedMemory) {
         server, usedMemory);
 }
 
-function _getRangeUsedMemory(server, beginTime, endTime, callback) {
-    db.all('SELECT used_memory AS value, created_time FROM `used_memory` ' +
-        'WHERE server=? AND created_time>=? AND created_time<=?',
-        server, beginTime, endTime, callback);
+function _getRangeUsedMemory(servers, beginTime, endTime, callback) {
+    var serverCount = servers.length;
+
+    var sql = 'SELECT used_memory AS value, server, created_time FROM `used_memory` WHERE server IN (?';
+    while (serverCount > 1) {
+      sql = sql + ', ?';
+      serverCount = serverCount - 1;
+    }
+    sql += ') AND created_time>=? AND created_time<=? ORDER BY created_time';
+
+    var stmtParams = servers;
+    stmtParams.push(beginTime);
+    stmtParams.push(endTime);
+    stmtParams.push(callback);
+    stmtParams.unshift(sql);
+
+    db.all.apply(db, stmtParams);
 }
 
 /**

@@ -14,7 +14,9 @@
   "license": "ISC",
   "dependencies": {
     "bootstrap": "^3.3.6",
+    "cn-bootstrap-datetimepicker": "^4.15.36",
     "co-body": "^4.0.0",
+    "highcharts": "^4.2.0",
     "ioredis": "^1.11.1",
     "jade": "^1.11.0",
     "jquery": "^2.1.4",

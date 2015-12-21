@@ -40,12 +40,13 @@ function _home(req, res) {
         var redisSentinels = clusterInfo.sentinels;
 
         if (redisSentinels) {
-            Object.getOwnPropertyNames(redisSentinels).forEach(function(ele, index, arr) {
+            Object.getOwnPropertyNames(redisSentinels).forEach(ele => {
                 var thisSentinel = redisSentinels[ele];
                 allSentinel.push({
                     address: ele,
                     version: thisSentinel.redis_version,
                     process_id: thisSentinel.process_id,
+                    pending_cmds: thisSentinel["pending-commands"],
                     uptime: Time.formatUpTime(thisSentinel.uptime_in_seconds)
                 });
             });
@@ -59,7 +60,11 @@ function _home(req, res) {
                 role: 'master',
                 version: redisMaster.redis_version,
                 process_id: redisMaster.process_id,
-                uptime: Time.formatUpTime(redisMaster.uptime_in_seconds)
+                used_memory: redisMaster.used_memory_human,
+                pending_cmds: redisMaster["pending-commands"],
+                uptime: Time.formatUpTime(redisMaster.uptime_in_seconds),
+                used_memory_peak: redisMaster.used_memory_peak_human,
+                total_commands_processed: redisMaster.total_commands_processed
             });
             // console.log(allRedis);
         }
@@ -72,7 +77,11 @@ function _home(req, res) {
                     role: 'slave',
                     version: thisSlave.redis_version,
                     process_id: thisSlave.process_id,
-                    uptime: Time.formatUpTime(thisSlave.uptime_in_seconds)
+                    used_memory: thisSlave.used_memory_human,
+                    pending_cmds: thisSlave["pending-commands"],
+                    uptime: Time.formatUpTime(thisSlave.uptime_in_seconds),
+                    used_memory_peak: thisSlave.used_memory_peak_human,
+                    total_commands_processed: thisSlave.total_commands_processed
                 });
             });
         }

@@ -11,6 +11,11 @@ const StatMapper = {
     'used_memory': DB.getRangeUsedMemory
 };
 
+const graphTypeMapper = {
+  'connected_client': 'line',
+  'used_memory': 'area'
+};
+
 function _checkStatName(statName) {
     return !!(statName in StatMapper);
 }
@@ -28,7 +33,7 @@ function _checkStatTimeRange(begin, end) {
     let beginTimestamp = Date.parse(begin);
     let endTimestamp = Date.parse(end);
 
-    let timeDiff = endTimestamp - beginTimestamp;
+    let timeDiff = (endTimestamp - beginTimestamp) / 1000;
 
     // 考虑性能, 限制只能获取一周范围的数据
     return !!(timeDiff <= 7 * 24 * 3600 && timeDiff >= 0);
@@ -42,12 +47,12 @@ function _stat(req, res) {
      *  - begin_time: 开始时间
      *  - end_time: 截止时间
      */
-    let statName = req.query.name;
-    let targetServer = req.query.server;
-    let statBeginTime = req.query.begin_time;
-    let statEndTime = req.query.end_time;
+    let statName = req.body.name;
+    let targetServers = req.body.servers;
+    let statBeginTime = req.body.begin_time;
+    let statEndTime = req.body.end_time;
 
-    if (statName === undefined || targetServer === undefined
+    if (statName === undefined || targetServers === undefined
         || statBeginTime === undefined || statEndTime === undefined) {
         res.toResponse('缺少必要的请求参数!', 400);
         return;
@@ -64,7 +69,8 @@ function _stat(req, res) {
         res.toResponse('参数statBeginTime和statEndTime的时间范围不合法!', 400);
         return;
     }
-    StatMapper[statName](targetServer, statBeginTime, statEndTime, function(err, result) {
+    targetServers = targetServers.split(',');
+    StatMapper[statName](targetServers, statBeginTime, statEndTime, function(err, result) {
         if (err) {
             res.toResponse(err.message, 500);
             return;
@@ -73,7 +79,23 @@ function _stat(req, res) {
             res.toResponse(JSON.stringify([]));
             return;
         }
-        res.toResponse(JSON.stringify(result));
+
+        var targetSeriesData = {};
+
+        result.forEach(record => {
+            if (!(record.server in targetSeriesData)) {
+                targetSeriesData[record.server] = [];
+            }
+          targetSeriesData[record.server].push([Date.parse(record.created_time), record.value]);
+        });
+        var respData = [];
+        Object.getOwnPropertyNames(targetSeriesData).forEach(server => {
+          respData.push({
+            name: server,
+            data: targetSeriesData[server]
+          })
+        });
+        res.toResponse(JSON.stringify(respData));
     });
 }
 

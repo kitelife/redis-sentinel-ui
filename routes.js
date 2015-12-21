@@ -23,12 +23,20 @@ const routes = {
         'verb': ['GET'],
         'action': controllers.Home
     },
+    '/cmd_page': {
+        'verb': ['GET'],
+        'action': controllers.Cmd_page
+    },
     '/cmd': {
         'verb': ['POST'],
         'action': controllers.Cmd
     },
-    '/stat': {
+    '/stat_page': {
         'verb': ['GET'],
+        'action': controllers.Stat_page
+    },
+    '/stat': {
+        'verb': ['POST'],
         'action': controllers.Stat
     }
 };

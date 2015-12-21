@@ -177,11 +177,33 @@ function _fetchClusterInfo() {
             return;
         }
 
-        ClusterInfo.sentinels = _parseSentinelMulti(result);
-        Object.getOwnPropertyNames(ClusterInfo.sentinels).forEach(val => {
-            let sentinel = ClusterInfo.sentinels[val];
-            _connAndInfo(sentinel.ip, sentinel.port, 'sentinels');
-        });
+        var parsedResultNoMe = _parseSentinelMulti(result);
+
+        //
+        var otherSentinelAddrs = Object.getOwnPropertyNames(parsedResultNoMe);
+        if (otherSentinelAddrs.length) {
+          var selectedAnotherSentinel = otherSentinelAddrs[0].split(':'),
+              anotherSentinelInstance = new Redis({host: selectedAnotherSentinel[0], port: selectedAnotherSentinel[1]});
+
+          anotherSentinelInstance.sentinel('sentinels', config.master_name, (err, result) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+
+            ClusterInfo.sentinels = _mergeObject(parsedResultNoMe, _parseSentinelMulti(result));
+            Object.getOwnPropertyNames(ClusterInfo.sentinels).forEach(val => {
+                let sentinel = ClusterInfo.sentinels[val];
+                _connAndInfo(sentinel.ip, sentinel.port, 'sentinels');
+            });
+          });
+        } else {
+          ClusterInfo.sentinels = parsedResultNoMe;
+          Object.getOwnPropertyNames(ClusterInfo.sentinels).forEach(val => {
+              let sentinel = ClusterInfo.sentinels[val];
+              _connAndInfo(sentinel.ip, sentinel.port, 'sentinels');
+          });
+        }
     });
 }
 
@@ -245,4 +267,3 @@ module.exports = {
     ActiveServer: _activeServer,
     isValidCommand: _isValidCommand
 };
-
