@@ -9,6 +9,10 @@ function _resp(content, code) {
         code = 200;
     }
     this.statusCode = code;
+    if (code >= 400) {
+        // 解决响应体乱码问题
+        this.writeHead(code, {'Content-Type': 'text/plain; charset=utf-8'});
+    }
     this.write(content);
     this.end();
 }
