@@ -109,7 +109,7 @@ function _home(req, res) {
                     total_connections_received: thisSlave.total_connections_received,
                     instantaneous_ops_per_sec: thisSlave.instantaneous_ops_per_sec,
                     keyspace_hits: keySpaceHits,
-                    keyspace_misses: keySpaceHitMisses,
+                    keyspace_misses: keySpaceMisses,
                     hit_rate: hitRate,
                     mem_allocator: thisSlave.mem_allocator
                 });
