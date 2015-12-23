@@ -56,9 +56,11 @@ function _home(req, res) {
         var redisMaster = clusterInfo.master;
         if (redisMaster) {
             var hitRate = 0;
-            var keySpaceHitMiss = redisMaster.keyspace_hits + redisMaster.keyspace_misses;
-            if (keySpaceHitMiss > 0) {
-                hitRate = (redisMaster.keyspace_hits / keySpaceHitMiss).toFixed(3);
+            var keySpaceHits = parseInt(redisMaster.keyspace_hits);
+            var keySpaceMisses = parseInt(redisMaster.keyspace_misses);
+            var keySpaceHitMisses = keySpaceHits + keySpaceMisses;
+            if (keySpaceHitMisses > 0) {
+                hitRate = (keySpaceHits / keySpaceHitMisses).toFixed(3);
             }
             allRedis.push({
                 address: redisMaster.ip + ':' + redisMaster.port,
@@ -74,8 +76,8 @@ function _home(req, res) {
                 mem_fragmentation_ratio: redisMaster.mem_fragmentation_ratio,
                 total_connections_received: redisMaster.total_connections_received,
                 instantaneous_ops_per_sec: redisMaster.instantaneous_ops_per_sec,
-                keyspace_hits: redisMaster.keyspace_hits,
-                keyspace_misses: redisMaster.keyspace_misses,
+                keyspace_hits: keySpaceHits,
+                keyspace_misses: keySpaceMisses,
                 hit_rate: hitRate,
                 mem_allocator: redisMaster.mem_allocator
             });
@@ -84,11 +86,13 @@ function _home(req, res) {
         var redisSlaves = clusterInfo.slaves;
         if (redisSlaves) {
             Object.getOwnPropertyNames(redisSlaves).forEach(function(ele, index, arr) {
-                var hitRate = 0;
                 var thisSlave = redisSlaves[ele];
-                var keySpaceHitMiss = thisSlave.keyspace_hits + thisSlave.keyspace_misses;
-                if (keySpaceHitMiss > 0) {
-                    hitRate = (thisSlave.keyspace_hits / keySpaceHitMiss).toFixed(3);
+                var hitRate = 0;
+                var keySpaceHits = parseInt(thisSlave.keyspace_hits);
+                var keySpaceMisses = parseInt(thisSlave.keyspace_misses);
+                var keySpaceHitMisses = keySpaceHits + keySpaceMisses;
+                if (keySpaceHitMisses > 0) {
+                    hitRate = (keySpaceHits / keySpaceHitMisses).toFixed(3);
                 }
                 allRedis.push({
                     address: ele,
@@ -104,8 +108,8 @@ function _home(req, res) {
                     mem_fragmentation_ratio: thisSlave.mem_fragmentation_ratio,
                     total_connections_received: thisSlave.total_connections_received,
                     instantaneous_ops_per_sec: thisSlave.instantaneous_ops_per_sec,
-                    keyspace_hits: thisSlave.keyspace_hits,
-                    keyspace_misses: thisSlave.keyspace_misses,
+                    keyspace_hits: keySpaceHits,
+                    keyspace_misses: keySpaceHitMisses,
                     hit_rate: hitRate,
                     mem_allocator: thisSlave.mem_allocator
                 });
