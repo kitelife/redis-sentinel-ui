@@ -276,6 +276,7 @@ function _collectServerInfo() {
             let parsedResp = cmdRespParser.infoRespParser(resp.split('\r\n'));
             DB.addNewConnectedClient(addr, parsedResp['connected_clients']);
             DB.addNewUsedMemory(addr, (parsedResp['used_memory'] / oneM).toFixed(3));
+            DB.addNewCMDPS(addr, parsedResp['instantaneous_ops_per_sec']);
             //
             newRedisConn.disconnect();
         });
