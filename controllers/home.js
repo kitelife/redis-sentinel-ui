@@ -53,10 +53,10 @@ function _home(req, res) {
         }
 
         var allRedis = [];
+        var hitRate = 0;
         var redisMaster = clusterInfo.master;
         if (redisMaster) {
-            var hitRate = 0,
-                keySpaceHitMiss = redisMaster.keyspace_hits + redisMaster.keyspace_misses;
+            var keySpaceHitMiss = redisMaster.keyspace_hits + redisMaster.keyspace_misses;
             if (keySpaceHitMiss > 0) {
                 hitRate = (redisMaster.keyspace_hits / keySpaceHitMiss).toFixed(3);
             }
@@ -84,9 +84,9 @@ function _home(req, res) {
         var redisSlaves = clusterInfo.slaves;
         if (redisSlaves) {
             Object.getOwnPropertyNames(redisSlaves).forEach(function(ele, index, arr) {
+                hitRate = 0;
                 var thisSlave = redisSlaves[ele];
-                var hitRate = 0,
-                    keySpaceHitMiss = thisSlave.keyspace_hits + thisSlave.keyspace_misses;
+                var keySpaceHitMiss = thisSlave.keyspace_hits + thisSlave.keyspace_misses;
                 if (keySpaceHitMiss > 0) {
                     hitRate = (thisSlave.keyspace_hits / keySpaceHitMiss).toFixed(3);
                 }
@@ -111,7 +111,6 @@ function _home(req, res) {
                 });
             });
         }
-
 
         var data = {
             sentinels: allSentinel,
