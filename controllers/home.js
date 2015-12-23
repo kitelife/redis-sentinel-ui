@@ -65,7 +65,13 @@ function _home(req, res) {
                 uptime: Time.formatUpTime(redisMaster.uptime_in_seconds),
                 used_memory_peak: redisMaster.used_memory_peak_human,
                 total_commands_processed: redisMaster.total_commands_processed,
-                rejected_connections: redisMaster.rejected_connections
+                rejected_connections: redisMaster.rejected_connections,
+                mem_fragmentation_ratio: redisMaster.mem_fragmentation_ratio,
+                total_connections_received: redisMaster.total_connections_received,
+                instantaneous_ops_per_sec: redisMaster.instantaneous_ops_per_sec,
+                keyspace_hits: redisMaster.keyspace_hits,
+                keyspace_misses: redisMaster.keyspace_misses,
+                mem_allocator: redisMaster.mem_allocator
             });
             // console.log(allRedis);
         }
@@ -83,7 +89,13 @@ function _home(req, res) {
                     uptime: Time.formatUpTime(thisSlave.uptime_in_seconds),
                     used_memory_peak: thisSlave.used_memory_peak_human,
                     total_commands_processed: thisSlave.total_commands_processed,
-                    rejected_connections: thisSlave.rejected_connections
+                    rejected_connections: thisSlave.rejected_connections,
+                    mem_fragmentation_ratio: thisSlave.mem_fragmentation_ratio,
+                    total_connections_received: thisSlave.total_connections_received,
+                    instantaneous_ops_per_sec: thisSlave.instantaneous_ops_per_sec,
+                    keyspace_hits: thisSlave.keyspace_hits,
+                    keyspace_misses: thisSlave.keyspace_misses,
+                    mem_allocator: thisSlave.mem_allocator
                 });
             });
         }

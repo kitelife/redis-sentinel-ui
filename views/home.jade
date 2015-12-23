@@ -53,6 +53,13 @@ block content
                             span #{redis.used_memory}
                     div(class="row")
                         div(class="col-md-6")
+                            label 内存分配器：
+                            span #{redis.mem_allocator}
+                        div(class="col-md-6")
+                            label 内存碎片比：
+                            span #{redis.mem_fragmentation_ratio}
+                    div(class="row")
+                        div(class="col-md-6")
                             label 等待执行命令数：
                             span #{redis.pending_cmds}
                         div(class="col-md-6")
@@ -60,8 +67,22 @@ block content
                             span #{redis.used_memory_peak}
                     div(class="row")
                         div(class="col-md-6")
-                            label 已处理命令数：
-                            span #{redis.total_commands_processed}
+                            label 已接连接总数：
+                            span #{redis.total_connections_received}
                         div(class="col-md-6")
                             label 拒绝的连接数：
                             span #{redis.rejected_connections}
+                    div(class="row")
+                        div(class="col-md-6")
+                            label 查询命中数：
+                            span #{redis.keyspace_hits}
+                        div(class="col-md-6")
+                            label 查询未命中数：
+                            span #{redis.keyspace_misses}
+                    div(class="row")
+                        div(class="col-md-6")
+                            label 已处理命令数：
+                            span #{redis.total_commands_processed}
+                        div(class="col-md-6")
+                            label 每秒处理命令数：
+                            span #{redis.instantaneous_ops_per_sec}
