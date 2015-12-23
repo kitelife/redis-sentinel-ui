@@ -92,8 +92,9 @@ $(function () {
                     title: {
                         text: statTitleMapper[ele]
                     },
-                    xAxis: {type: 'datetime'},
-                    series: resp
+                    xAxis: resp.xAxis ? resp.xAxis : {type: 'datetime'},
+                    yAxis: resp.yAxis ? resp.yAxis : null,
+                    series: resp.series
                 });
             });
         });

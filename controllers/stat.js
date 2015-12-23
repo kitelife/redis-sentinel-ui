@@ -12,8 +12,15 @@ const StatMapper = {
 };
 
 const graphTypeMapper = {
-    'connected_client': 'spline',
-    'used_memory': 'area'
+    'connected_client': {
+        type: 'spline',
+        yAxis: {
+            allowDecimals: false
+        }
+    },
+    'used_memory': {
+        type: 'area'
+    }
 };
 
 function _checkStatName(statName) {
@@ -88,18 +95,23 @@ function _stat(req, res) {
             }
             targetSeriesData[record.server].push([Date.parse(record.created_time), record.value]);
         });
-        var respData = [];
+        var respData = {
+            xAxis: graphTypeMapper[statName].xAxis ? graphTypeMapper[statName].xAxis : null,
+            yAxis: graphTypeMapper[statName].yAxis ? graphTypeMapper[statName].yAxis : null,
+            series: []
+        };
         Object.getOwnPropertyNames(targetSeriesData).forEach(server => {
-            respData.push({
+            respData.series.push({
                 name: server,
-                type: graphTypeMapper[statName],
+                type: graphTypeMapper[statName].type,
                 marker: {
                     enabled: false
                 },
                 lineWidth: 1.5,
                 data: targetSeriesData[server]
-            })
+            });
         });
+
         res.toResponse(JSON.stringify(respData));
     });
 }
