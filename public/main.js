@@ -8,7 +8,8 @@ Highcharts.setOptions({ global: { useUTC: false } });
 
 var statTitleMapper = {
     'connected_client': '客户端连接数(个)',
-    'used_memory': '内存使用量(MB)'
+    'used_memory': '内存使用量(MB)',
+    'cmd_ps': '每秒处理命令数(个)'
 };
 
 $(function () {
