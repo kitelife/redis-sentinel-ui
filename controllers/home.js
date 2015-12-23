@@ -79,7 +79,11 @@ function _home(req, res) {
                 keyspace_hits: keySpaceHits,
                 keyspace_misses: keySpaceMisses,
                 hit_rate: hitRate,
-                mem_allocator: redisMaster.mem_allocator
+                mem_allocator: redisMaster.mem_allocator,
+                used_cpu_sys: redisMaster.used_cpu_sys,
+                used_cpu_user: redisMaster.used_cpu_user,
+                used_cpu_sys_children: redisMaster.used_cpu_sys_children,
+                used_cpu_user_children: redisMaster.used_cpu_user_children
             });
             // console.log(allRedis);
         }
@@ -87,6 +91,7 @@ function _home(req, res) {
         if (redisSlaves) {
             Object.getOwnPropertyNames(redisSlaves).forEach(function(ele, index, arr) {
                 var thisSlave = redisSlaves[ele];
+
                 var hitRate = 0;
                 var keySpaceHits = parseInt(thisSlave.keyspace_hits);
                 var keySpaceMisses = parseInt(thisSlave.keyspace_misses);
@@ -94,6 +99,7 @@ function _home(req, res) {
                 if (keySpaceHitMisses > 0) {
                     hitRate = (keySpaceHits / keySpaceHitMisses).toFixed(3);
                 }
+
                 allRedis.push({
                     address: ele,
                     role: 'slave',
@@ -111,7 +117,11 @@ function _home(req, res) {
                     keyspace_hits: keySpaceHits,
                     keyspace_misses: keySpaceMisses,
                     hit_rate: hitRate,
-                    mem_allocator: thisSlave.mem_allocator
+                    mem_allocator: thisSlave.mem_allocator,
+                    used_cpu_sys: thisSlave.used_cpu_sys,
+                    used_cpu_user: thisSlave.used_cpu_user,
+                    used_cpu_sys_children: thisSlave.used_cpu_sys_children,
+                    used_cpu_user_children: thisSlave.used_cpu_user_children
                 });
             });
         }

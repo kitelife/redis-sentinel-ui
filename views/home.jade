@@ -60,6 +60,20 @@ block content
                             span #{redis.mem_fragmentation_ratio}
                     div(class="row")
                         div(class="col-md-6")
+                            label 进程系统态CPU时间：
+                            span #{redis.used_cpu_sys}秒
+                        div(class="col-md-6")
+                            label 进程用户态CPU时间：
+                            span #{redis.used_cpu_user}秒
+                    div(class="row")
+                        div(class="col-md-6")
+                            label 后台子进程系统态CPU时间：
+                            span #{redis.used_cpu_sys_children}秒
+                        div(class="col-md-6")
+                            label 后台子进程用户态CPU时间：
+                            span #{redis.used_cpu_user_children}秒
+                    div(class="row")
+                        div(class="col-md-6")
                             label 等待执行命令数：
                             span #{redis.pending_cmds}
                         div(class="col-md-6")
