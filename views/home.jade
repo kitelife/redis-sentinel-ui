@@ -74,6 +74,13 @@ block content
                             span #{redis.rejected_connections}
                     div(class="row")
                         div(class="col-md-6")
+                            label 已处理命令数：
+                            span #{redis.total_commands_processed}
+                        div(class="col-md-6")
+                            label 每秒处理命令数：
+                            span #{redis.instantaneous_ops_per_sec}
+                    div(class="row")
+                        div(class="col-md-6")
                             label 查询命中数：
                             span #{redis.keyspace_hits}
                         div(class="col-md-6")
@@ -81,8 +88,5 @@ block content
                             span #{redis.keyspace_misses}
                     div(class="row")
                         div(class="col-md-6")
-                            label 已处理命令数：
-                            span #{redis.total_commands_processed}
-                        div(class="col-md-6")
-                            label 每秒处理命令数：
-                            span #{redis.instantaneous_ops_per_sec}
+                            label 查询命中率：
+                            span #{redis.hit_rate}

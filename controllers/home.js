@@ -55,6 +55,11 @@ function _home(req, res) {
         var allRedis = [];
         var redisMaster = clusterInfo.master;
         if (redisMaster) {
+            var hitRate = 0,
+                keySpaceHitMiss = redisMaster.keyspace_hits + redisMaster.keyspace_misses;
+            if (keySpaceHitMiss > 0) {
+                hitRate = (redisMaster.keyspace_hits / keySpaceHitMiss).toFixed(3);
+            }
             allRedis.push({
                 address: redisMaster.ip + ':' + redisMaster.port,
                 role: 'master',
@@ -71,6 +76,7 @@ function _home(req, res) {
                 instantaneous_ops_per_sec: redisMaster.instantaneous_ops_per_sec,
                 keyspace_hits: redisMaster.keyspace_hits,
                 keyspace_misses: redisMaster.keyspace_misses,
+                hit_rate: hitRate,
                 mem_allocator: redisMaster.mem_allocator
             });
             // console.log(allRedis);
@@ -79,6 +85,11 @@ function _home(req, res) {
         if (redisSlaves) {
             Object.getOwnPropertyNames(redisSlaves).forEach(function(ele, index, arr) {
                 var thisSlave = redisSlaves[ele];
+                var hitRate = 0,
+                    keySpaceHitMiss = thisSlave.keyspace_hits + thisSlave.keyspace_misses;
+                if (keySpaceHitMiss > 0) {
+                    hitRate = (thisSlave.keyspace_hits / keySpaceHitMiss).toFixed(3);
+                }
                 allRedis.push({
                     address: ele,
                     role: 'slave',
@@ -95,6 +106,7 @@ function _home(req, res) {
                     instantaneous_ops_per_sec: thisSlave.instantaneous_ops_per_sec,
                     keyspace_hits: thisSlave.keyspace_hits,
                     keyspace_misses: thisSlave.keyspace_misses,
+                    hit_rate: hitRate,
                     mem_allocator: thisSlave.mem_allocator
                 });
             });

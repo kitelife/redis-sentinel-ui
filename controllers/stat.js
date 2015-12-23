@@ -8,7 +8,8 @@ const DB = require('../models/db');
 
 const StatMapper = {
     'connected_client': DB.getRangeConnectedClient,
-    'used_memory': DB.getRangeUsedMemory
+    'used_memory': DB.getRangeUsedMemory,
+    'cmd_ps': DB.getRangeCMDPS
 };
 
 const graphTypeMapper = {
@@ -20,6 +21,12 @@ const graphTypeMapper = {
     },
     'used_memory': {
         type: 'area'
+    },
+    'cmd_ps': {
+        type: 'spline',
+        yAxis: {
+            allowDecimals: false
+        }
     }
 };
 

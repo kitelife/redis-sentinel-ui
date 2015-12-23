@@ -65,6 +65,18 @@ CREATE TABLE IF NOT EXISTS used_memory (
 db.run(create_used_memory);
 // 手动添加个索引吧
 // CREATE INDEX used_memory_server_idx ON used_memory (server);
+
+var create_cmd_per_second = `
+CREATE TABLE IF NOT EXISTS cmd_ps (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    server TEXT NOT NULL,
+    cmd_ps INTEGER NOT NULL,
+    created_time NOT NULL DEFAULT (datetime('now','localtime'))
+)
+`;
+db.run(create_cmd_per_second);
+// 手动添加索引
+// CREATE INDEX cmd_ps_server_idx ON cmd_ps (server);
 /**
  * 更新数据库中sentinel的状态
  *
@@ -138,10 +150,10 @@ function _getRangeConnectedClient(servers, beginTime, endTime, callback) {
     sql += ') AND created_time>=? AND created_time<=? ORDER BY created_time';
 
     var stmtParams = servers;
+    stmtParams.unshift(sql);
     stmtParams.push(beginTime);
     stmtParams.push(endTime);
     stmtParams.push(callback);
-    stmtParams.unshift(sql);
 
     db.all.apply(db, stmtParams);
 }
@@ -162,10 +174,33 @@ function _getRangeUsedMemory(servers, beginTime, endTime, callback) {
     sql += ') AND created_time>=? AND created_time<=? ORDER BY created_time';
 
     var stmtParams = servers;
+    stmtParams.unshift(sql);
     stmtParams.push(beginTime);
     stmtParams.push(endTime);
     stmtParams.push(callback);
+
+    db.all.apply(db, stmtParams);
+}
+
+function _addNewCMDPS(server, cmd_ps) {
+    db.run('INSERT INTO `cmd_ps` (`server`, `cmd_ps`) VALUES (?, ?)', server, cmd_ps);
+}
+
+function _getRangeCMDPS(servers, beginTime, endTime, callback) {
+    var serverCount = servers.length;
+
+    var sql = 'SELECT cmd_ps AS value, server, created_time FROM `cmd_ps` WHERE server IN (?';
+    while (serverCount > 1) {
+        sql = sql + ', ?';
+        serverCount = serverCount - 1;
+    }
+    sql += ') AND created_time>=? AND created_time<=? ORDER BY created_time';
+
+    var stmtParams = servers;
     stmtParams.unshift(sql);
+    stmtParams.push(beginTime);
+    stmtParams.push(endTime);
+    stmtParams.push(callback);
 
     db.all.apply(db, stmtParams);
 }
@@ -182,3 +217,5 @@ exports.addNewConnectedClient = _addNewConnectedClient;
 exports.getRangeConnectedClient = _getRangeConnectedClient;
 exports.addNewUsedMemory = _addNewUsedMemory;
 exports.getRangeUsedMemory = _getRangeUsedMemory;
+exports.addNewCMDPS = _addNewCMDPS;
+exports.getRangeCMDPS = _getRangeCMDPS;
