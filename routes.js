@@ -64,7 +64,7 @@ function _router(req, res) {
     let pathname = urlParts.pathname;
 
     // 输出请求路径及方法
-    console.log(pathname, req.method);
+    // console.log(pathname, req.method);
 
     // 匹配路由表
     if ((pathname in routes) && (routes[pathname].verb.indexOf(req.method) != -1)) {
