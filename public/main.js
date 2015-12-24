@@ -81,7 +81,7 @@ $(function () {
             var loadingPartID = 'loading_' + ele,
                 loadingPart = '<div class="row" id="'+ loadingPartID +'">' +
                     '<div class="loading-tip col-md-6"">' +
-                    '<span>正在加载数据,请耐心等待......</span>' +
+                    '<span>正在加载数据,请耐心等待...</span>' +
                     '</div></div>';
 
             $statGraphPart.append(loadingPart);
