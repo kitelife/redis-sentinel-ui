@@ -1,5 +1,5 @@
 {
-  "name": "redis-sentinel-manager",
+  "name": "redis-sentinel-ui",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
