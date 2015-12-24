@@ -1,7 +1,11 @@
+/**
+ * Created by xiayf on 15/12/24.
+ */
+
 'use strict';
 
-var RedisSentinel = require('../models/sentinel');
-var config = require('../config');
+var RedisSentinel = require('./models/sentinel');
+var config = require('./config');
 
 // 先获取一下
 setTimeout(RedisSentinel.update_sentinel_status, 3000);
