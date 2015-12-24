@@ -16,6 +16,7 @@ const STORAGE_FILE_PATH = './rsm.db';
 var configuration = {
     debug: false,
     port: PORT,
+    static_prefix: '/public/',
     sentinels: [
         {
             host: '127.0.0.1',

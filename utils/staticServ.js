@@ -87,17 +87,17 @@ function noDotFiles(x) {
 }
 
 /**
- * @param name
+ * @param pathname
  * @param dir
  * @param options
  * @param files
  * @returns {{}}
  * @private
  */
-function loadFile(name, dir, options, files) {
-    var pathname = options.prefix + name;
+function loadFile(pathname, dir, options, files) {
+    // 引用, 修改了obj,即修改了files[pathname]
     var obj = files[pathname] = files[pathname] ? files[pathname] : {};
-    var filename = obj.path = path.join(dir, name);
+    var filename = obj.path = path.join(dir, pathname);
     var stats = fs.statSync(filename);
     var buffer = fs.readFileSync(filename);
 
@@ -130,47 +130,47 @@ function safeDecodeURIComponent(text) {
  * @private
  */
 function staticService(pathname, callback) {
-    if (pathname.indexOf('/public/') !== 0) {
-        callback(new Error('404 Not Found'));
+    if (pathname.indexOf(config.static_prefix) !== 0) {
+        callback({code: 404, msg: '不存在目标文件'});
         return;
     }
 
     if (config.debug) {
-        let filePath = path.join(global.RootDir, pathname);
-        let fileStat = fs.statSync(filePath);
+        var filePath = path.join(global.RootDir, pathname);
+        var fileStat = fs.statSync(filePath);
 
         if (fileStat.isFile()) {
             fs.readFile(filePath, function(err, data) {
                 callback(err ? {code: 500, msg: err.message} : null, data);
             });
-        } else if (fileStat.isDirectory()) {
-            callback({code: 403, msg: '不支持目录'});
+        } else {
+            callback({code: 404, msg: '不存在目标文件'});
         }
         return;
     }
 
+    // 去掉'/public/'
+    pathname = pathname.slice(config.static_prefix.length);
     var filename = safeDecodeURIComponent(path.normalize(pathname));
-    var file = staticFileObjs[filename];
 
+    var file = staticFileObjs[filename];
     if (!file) {
         if (path.basename(filename)[0] === '.') {
             callback({code: 403, msg: '没有权限'});
             return;
         }
-        if (filename.charAt(0) === path.sep) filename = filename.slice(1);
         try {
-            var s = fs.statSync(path.join(global.RootDir, filename));
+            var s = fs.statSync(path.join(staticDir, filename));
             if (!s.isFile()) {
                 callback({code: 404, msg: '不存在目标文件'});
                 return;
             }
         } catch (err) {
-            console.error(err);
             callback({code: 500, msg: '系统异常'});
             return;
         }
 
-        file = loadFile(filename, global.RootDir, options, staticFileObjs)
+        file = loadFile(filename, staticDir, options, staticFileObjs)
     }
 
     callback(null, file.buffer);
