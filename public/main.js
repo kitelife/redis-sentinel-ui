@@ -67,10 +67,21 @@ $(function () {
         var beginDateTime = $('input[name="begin-datetime"]').val();
         var endDateTime = $('input[name="end-datetime"]').val();
 
-        // 一个指标一张图
-        $('.stat-graph-part').empty();
+        var $statGraphPart = $('.stat-graph-part');
+        $statGraphPart.empty();
 
+        if (selectedServer.length === 0 || selectedIndex.length === 0 || !beginDateTime || !endDateTime) {
+            $statGraphPart.append('<div class="alert alert-danger error-tip col-md-6" role="alert">缺少必要参数!</div>');
+            return;
+        }
+
+        // 一个指标一张图
         selectedIndex.forEach(function (ele) {
+            // 加loading效果
+            var loadingPartID = 'loading_' + ele,
+                loadingPart = '<div class="well well-lg loading-tip" id="' + loadingPartID + '"><span>正在加载数据,请耐心等待</span></div>';
+            $statGraphPart.append(loadingPart);
+
             var req = $.ajax({
                 method: 'POST',
                 url: "/stat",
@@ -83,6 +94,9 @@ $(function () {
                 dataType: 'json'
             });
             req.done(function (resp) {
+                //
+                $('#' + loadingPartID).remove();
+
                 var containerID = 'container_' + ele;
                 $('.stat-graph-part').append('<div id=' + containerID + '></div>');
 
@@ -97,6 +111,15 @@ $(function () {
                     yAxis: resp.yAxis ? resp.yAxis : null,
                     series: resp.series
                 });
+            });
+            req.fail(function(xhr) {
+                //
+                $('#' + loadingPartID).remove();
+
+                var alertPart = '<div class="alert alert-danger error-tip col-md-6" role="alert">' +
+                    '<strong>'+ xhr.status +'</strong> - '  + xhr.statusText + '<p>' + xhr.responseText + '</p>'
+                    + '</div>';
+                $('.stat-graph-part').append(alertPart);
             });
         });
     });

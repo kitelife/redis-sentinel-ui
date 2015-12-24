@@ -80,7 +80,7 @@ function _stat(req, res) {
         return;
     }
     if (_checkStatTimeRange(statBeginTime, statEndTime) === false) {
-        res.toResponse('参数statBeginTime和statEndTime的时间范围不合法!', 400);
+        res.toResponse('时间范围不合法! 应为: 0 < 结束时间点-开始时间点 < 7天', 400);
         return;
     }
     targetServers = targetServers.split(',');
