@@ -118,9 +118,9 @@ $(function () {
                 //
                 $('#' + loadingPartID).remove();
 
-                var alertPart = '<div class="alert alert-danger error-tip col-md-6" role="alert">' +
+                var alertPart = '<div class="row"><div class="alert alert-danger error-tip col-md-6" role="alert">' +
                     '<strong>'+ xhr.status +'</strong> - '  + xhr.statusText + '<p>' + xhr.responseText + '</p>'
-                    + '</div>';
+                    + '</div></div>';
                 $('.stat-graph-part').append(alertPart);
             });
         });
