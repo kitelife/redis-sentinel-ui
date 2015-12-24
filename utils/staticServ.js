@@ -22,7 +22,8 @@ var staticFileObjs = Object.create(null);
 var staticDir = path.join(global.RootDir, 'public');
 
 var options = {
-    buffer: !config.debug
+    buffer: !config.debug,
+    maxAge: config.debug ? 0 : 60 * 60 * 24 * 7
 };
 
 staticCache(staticDir, options, staticFileObjs);
@@ -135,13 +136,22 @@ function staticService(pathname, callback) {
         return;
     }
 
-    if (config.debug) {
-        var filePath = path.join(global.RootDir, pathname);
-        var fileStat = fs.statSync(filePath);
+    // 去掉'/public/'
+    pathname = pathname.slice(config.static_prefix.length);
+    var filename = safeDecodeURIComponent(path.normalize(pathname));
 
+    var filePath = path.join(staticDir, pathname);
+    try {
+        var fileStat = fs.statSync(filePath);
+    } catch (err) {
+        callback({code: 500, msg: '系统异常'});
+        return;
+    }
+
+    if (config.debug) {
         if (fileStat.isFile()) {
             fs.readFile(filePath, function(err, data) {
-                callback(err ? {code: 500, msg: err.message} : null, data);
+                callback(err ? {code: 500, msg: err.message} : null, {cached: false, data: data});
             });
         } else {
             callback({code: 404, msg: '不存在目标文件'});
@@ -149,31 +159,27 @@ function staticService(pathname, callback) {
         return;
     }
 
-    // 去掉'/public/'
-    pathname = pathname.slice(config.static_prefix.length);
-    var filename = safeDecodeURIComponent(path.normalize(pathname));
-
     var file = staticFileObjs[filename];
     if (!file) {
         if (path.basename(filename)[0] === '.') {
             callback({code: 403, msg: '没有权限'});
             return;
         }
-        try {
-            var s = fs.statSync(path.join(staticDir, filename));
-            if (!s.isFile()) {
-                callback({code: 404, msg: '不存在目标文件'});
-                return;
-            }
-        } catch (err) {
-            callback({code: 500, msg: '系统异常'});
+
+        if (!fileStat.isFile()) {
+            callback({code: 404, msg: '不存在目标文件'});
             return;
         }
 
         file = loadFile(filename, staticDir, options, staticFileObjs)
+    } else {
+        // 检查自缓存以来文件是否变更过
+        if (fileStat.mtime > new Date(file.mtime)) {
+            file = loadFile(filename, staticDir, options, staticFileObjs);
+        }
     }
 
-    callback(null, file.buffer);
+    callback(null, {cached: true, data: file});
 }
 
 /**

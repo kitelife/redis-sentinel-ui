@@ -66,10 +66,11 @@ function _router(req, res) {
     // 输出请求路径及方法
     // console.log(pathname, req.method);
 
+    // 绑定一些方法
+    res.toResponse = RespUtil.toRespone;
+
     // 匹配路由表
     if ((pathname in routes) && (routes[pathname].verb.indexOf(req.method) != -1)) {
-        // 绑定一些方法
-        res.toResponse = RespUtil.toRespone;
         // 统一解析保存URL查询字符串的请求参数
         req.query = qs.parse(urlParts.query);
 
@@ -88,12 +89,31 @@ function _router(req, res) {
         return;
     }
 
-    StaticServ(pathname, function(err, data) {
+    StaticServ(pathname, function(err, result) {
         if (err) {
-            res.statusCode = err.code;
-            res.write(err.msg);
+            res.toResponse(err.msg, err.code);
+            return;
+        }
+        if (result.cached) {
+            var data = result.data;
+
+            var statusCode = 200;
+            // 写响应头, 以及可能相应304
+            var ifNoneMatch = req.headers['if-none-match'];
+            if (ifNoneMatch && ifNoneMatch == data.md5) {
+                statusCode = 304;
+            }
+
+            res.statusCode = statusCode;
+            res.setHeader('Cache-Control', data.cacheControl || 'public, max-age=' + data.maxAge);
+            res.setHeader('ETag', data.md5);
+            res.setHeader('Expires', (new Date(Date.now() + data.maxAge * 1000)).toUTCString());
+
+            if (statusCode === 200) {
+                res.write(data.buffer);
+            }
         } else {
-            res.write(data);
+            res.write(result.data);
         }
         res.end();
     });
