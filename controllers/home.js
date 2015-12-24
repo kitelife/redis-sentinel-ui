@@ -53,78 +53,52 @@ function _home(req, res) {
         }
 
         var allRedis = [];
+
+        var rawRedisServers = {};
         var redisMaster = clusterInfo.master;
         if (redisMaster) {
+            rawRedisServers[redisMaster.ip + ':' + redisMaster.port] = redisMaster;
+        }
+        var redisSlaves = clusterInfo.slaves;
+        if (redisSlaves) {
+            rawRedisServers = Object.assign(rawRedisServers, redisSlaves);
+        }
+
+        Object.getOwnPropertyNames(rawRedisServers).forEach(function(ele) {
+            var thisRedisServer = rawRedisServers[ele];
+
             var hitRate = 0;
-            var keySpaceHits = parseInt(redisMaster.keyspace_hits);
-            var keySpaceMisses = parseInt(redisMaster.keyspace_misses);
+            var keySpaceHits = parseInt(thisRedisServer.keyspace_hits);
+            var keySpaceMisses = parseInt(thisRedisServer.keyspace_misses);
             var keySpaceHitMisses = keySpaceHits + keySpaceMisses;
             if (keySpaceHitMisses > 0) {
                 hitRate = (keySpaceHits / keySpaceHitMisses).toFixed(3);
             }
+
             allRedis.push({
-                address: redisMaster.ip + ':' + redisMaster.port,
-                role: 'master',
-                version: redisMaster.redis_version,
-                process_id: redisMaster.process_id,
-                used_memory: redisMaster.used_memory_human,
-                pending_cmds: redisMaster["pending-commands"],
-                uptime: Time.formatUpTime(redisMaster.uptime_in_seconds),
-                used_memory_peak: redisMaster.used_memory_peak_human,
-                total_commands_processed: redisMaster.total_commands_processed,
-                rejected_connections: redisMaster.rejected_connections,
-                mem_fragmentation_ratio: redisMaster.mem_fragmentation_ratio,
-                total_connections_received: redisMaster.total_connections_received,
-                instantaneous_ops_per_sec: redisMaster.instantaneous_ops_per_sec,
+                address: ele,
+                role: thisRedisServer.role,
+                version: thisRedisServer.redis_version,
+                process_id: thisRedisServer.process_id,
+                used_memory: thisRedisServer.used_memory_human,
+                pending_cmds: thisRedisServer["pending-commands"],
+                uptime: Time.formatUpTime(thisRedisServer.uptime_in_seconds),
+                used_memory_peak: thisRedisServer.used_memory_peak_human,
+                total_commands_processed: thisRedisServer.total_commands_processed,
+                rejected_connections: thisRedisServer.rejected_connections,
+                mem_fragmentation_ratio: thisRedisServer.mem_fragmentation_ratio,
+                total_connections_received: thisRedisServer.total_connections_received,
+                instantaneous_ops_per_sec: thisRedisServer.instantaneous_ops_per_sec,
                 keyspace_hits: keySpaceHits,
                 keyspace_misses: keySpaceMisses,
                 hit_rate: hitRate,
-                mem_allocator: redisMaster.mem_allocator,
-                used_cpu_sys: redisMaster.used_cpu_sys,
-                used_cpu_user: redisMaster.used_cpu_user,
-                used_cpu_sys_children: redisMaster.used_cpu_sys_children,
-                used_cpu_user_children: redisMaster.used_cpu_user_children
+                mem_allocator: thisRedisServer.mem_allocator,
+                used_cpu_sys: thisRedisServer.used_cpu_sys,
+                used_cpu_user: thisRedisServer.used_cpu_user,
+                used_cpu_sys_children: thisRedisServer.used_cpu_sys_children,
+                used_cpu_user_children: thisRedisServer.used_cpu_user_children
             });
-            // console.log(allRedis);
-        }
-        var redisSlaves = clusterInfo.slaves;
-        if (redisSlaves) {
-            Object.getOwnPropertyNames(redisSlaves).forEach(function(ele, index, arr) {
-                var thisSlave = redisSlaves[ele];
-
-                var hitRate = 0;
-                var keySpaceHits = parseInt(thisSlave.keyspace_hits);
-                var keySpaceMisses = parseInt(thisSlave.keyspace_misses);
-                var keySpaceHitMisses = keySpaceHits + keySpaceMisses;
-                if (keySpaceHitMisses > 0) {
-                    hitRate = (keySpaceHits / keySpaceHitMisses).toFixed(3);
-                }
-
-                allRedis.push({
-                    address: ele,
-                    role: 'slave',
-                    version: thisSlave.redis_version,
-                    process_id: thisSlave.process_id,
-                    used_memory: thisSlave.used_memory_human,
-                    pending_cmds: thisSlave["pending-commands"],
-                    uptime: Time.formatUpTime(thisSlave.uptime_in_seconds),
-                    used_memory_peak: thisSlave.used_memory_peak_human,
-                    total_commands_processed: thisSlave.total_commands_processed,
-                    rejected_connections: thisSlave.rejected_connections,
-                    mem_fragmentation_ratio: thisSlave.mem_fragmentation_ratio,
-                    total_connections_received: thisSlave.total_connections_received,
-                    instantaneous_ops_per_sec: thisSlave.instantaneous_ops_per_sec,
-                    keyspace_hits: keySpaceHits,
-                    keyspace_misses: keySpaceMisses,
-                    hit_rate: hitRate,
-                    mem_allocator: thisSlave.mem_allocator,
-                    used_cpu_sys: thisSlave.used_cpu_sys,
-                    used_cpu_user: thisSlave.used_cpu_user,
-                    used_cpu_sys_children: thisSlave.used_cpu_sys_children,
-                    used_cpu_user_children: thisSlave.used_cpu_user_children
-                });
-            });
-        }
+        });
 
         var data = {
             sentinels: allSentinel,
