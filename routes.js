@@ -1,6 +1,6 @@
 /**
  * @file: routes.js
- * @author: gejiawen, youngsterxyf
+ * @author: youngsterxyf, gejiawen
  * @date: 15/12/4 17:19
  * @description: routes.js
  */

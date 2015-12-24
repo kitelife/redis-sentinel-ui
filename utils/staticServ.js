@@ -1,6 +1,6 @@
 /**
  * @file: static.js
- * @author: gejiawen
+ * @author: youngsterxyf, gejiawen
  * @date: 15/12/5 20:35
  * @description: static.js
  */
