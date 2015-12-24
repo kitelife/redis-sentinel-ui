@@ -11,7 +11,9 @@
 
 ## 截图
 
-![rsm-main](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-main.png)
+![rsm-main-1](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-main-1.png)
+![rsm-main-2](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-main-2.png)
 ![rsm-stat-1](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-stat-1.png)
 ![rsm-stat-2](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-stat-2.png)
+![rsm-stat-3](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-stat-3.png)
 ![rsm-cmd](https://raw.github.com/youngsterxyf/redis-sentinel-ui/master/screenshot/rsm-cmd.png)
