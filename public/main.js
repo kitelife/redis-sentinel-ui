@@ -79,7 +79,7 @@ $(function () {
         selectedIndex.forEach(function (ele) {
             // 加loading效果
             var loadingPartID = 'loading_' + ele,
-                loadingPart = '<div class="row"><div class="well well-lg loading-tip col-md-6" id="' +
+                loadingPart = '<div class="row"><div class="loading-tip col-md-6" id="' +
                     loadingPartID + '"><span>正在加载数据,请耐心等待</span></div></div>';
 
             $statGraphPart.append(loadingPart);
