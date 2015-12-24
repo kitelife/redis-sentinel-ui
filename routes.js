@@ -90,7 +90,8 @@ function _router(req, res) {
 
     StaticServ(pathname, function(err, data) {
         if (err) {
-            res.write(err.message);
+            res.statusCode = err.code;
+            res.write(err.msg);
         } else {
             res.write(data);
         }

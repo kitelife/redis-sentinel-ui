@@ -14,6 +14,7 @@ const PORT = 8080;
 const STORAGE_FILE_PATH = './rsm.db';
 
 var configuration = {
+    debug: false,
     port: PORT,
     sentinels: [
         {

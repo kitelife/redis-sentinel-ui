@@ -6,20 +6,6 @@
 
 const gulp = require('gulp');
 const browserify = require('gulp-browserify');
-const sourcemaps = require('gulp-sourcemaps');
-const babel = require('gulp-babel');
-const concat = require('gulp-concat');
-
-gulp.task('babel', () => {
-    gulp.src(['controllers/**/*.js', 'models/**/*.js'])
-        .pipe(sourcemaps.init())
-        .pipe(babel({
-            presets: ['es2015']
-        }))
-        .pipe(concat('all.js'))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('dist'));
-});
 
 gulp.task('browserify', () => {
     // browserify编译

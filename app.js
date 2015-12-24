@@ -1,5 +1,8 @@
 'use strict';
 
+// store global var
+global.RootDir = __dirname;
+
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 var http = require('http');
@@ -11,9 +14,6 @@ var routes = require('./routes');
 if (!config.sentinels.length) {
     console.error('请配置sentinel服务器');
 }
-
-// store global var
-global.RootDir = __dirname;
 
 if (cluster.isMaster) {
     // Fork workers.
