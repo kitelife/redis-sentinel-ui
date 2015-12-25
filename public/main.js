@@ -12,6 +12,12 @@ var statTitleMapper = {
     'cmd_ps': '每秒处理命令数(个)'
 };
 
+function genErrorAlert(xhr) {
+    return '<div class="row"><div class="alert alert-danger error-tip col-md-6" role="alert">' +
+        '<strong>'+ xhr.status +'</strong> - '  + xhr.statusText + '<p>' + xhr.responseText + '</p>'
+        + '</div></div>';
+}
+
 $(function () {
     $('#begin_datetime').datetimepicker({
         format: 'YYYY-MM-DD HH:mm:ss'
@@ -22,7 +28,9 @@ $(function () {
 
     $('#submit_cmd').on('click', function ($e) {
         $e.preventDefault();
-        $('#cmd_output').empty();
+
+        var $cmdOutput = $('#cmd_output');
+        $cmdOutput.empty();
 
         var cmd = $('input[name="cmd"]').val(),
             cmdParts = cmd.split(' '),
@@ -31,6 +39,15 @@ $(function () {
         if (cmdParts.length > 1) {
             params = cmdParts.slice(1).join(' ');
         }
+
+        // 加loading效果
+        var loadingPart = '<div class="row" id="loading-part">' +
+                '<div class="loading-tip col-md-6"">' +
+                '<span>正在执行命令,请耐心等待...</span>' +
+                '</div></div>';
+        $cmdOutput.append(loadingPart);
+
+        var $loadingPart = $('#loading_part');
 
         var req = $.ajax({
             "method": "POST",
@@ -42,8 +59,14 @@ $(function () {
             dataType: "text"
         });
         req.done(function (resp) {
+            $loadingPart.remove();
+
             resp = '<pre>' + resp + '</pre>';
-            $('#cmd_output').html(resp);
+            $cmdOutput.html(resp);
+        });
+        req.fail(function(xhr) {
+            $loadingPart.remove();
+            $cmdOutput.append(genErrorAlert(xhr));
         });
     });
 
@@ -117,13 +140,8 @@ $(function () {
                 });
             });
             req.fail(function(xhr) {
-                //
                 $('#' + loadingPartID).remove();
-
-                var alertPart = '<div class="row"><div class="alert alert-danger error-tip col-md-6" role="alert">' +
-                    '<strong>'+ xhr.status +'</strong> - '  + xhr.statusText + '<p>' + xhr.responseText + '</p>'
-                    + '</div></div>';
-                $('.stat-graph-part').append(alertPart);
+                $('.stat-graph-part').append(genErrorAlert(xhr));
             });
         });
     });
