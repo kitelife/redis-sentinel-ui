@@ -41,7 +41,7 @@ $(function () {
         }
 
         // 加loading效果
-        var loadingPart = '<div class="row" id="loading-part">' +
+        var loadingPart = '<div class="row" id="loading_part">' +
                 '<div class="loading-tip col-md-6"">' +
                 '<span>正在执行命令,请耐心等待...</span>' +
                 '</div></div>';
