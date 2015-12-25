@@ -7,8 +7,17 @@
 
 'use strict';
 
-var Sentinel = require('../models/sentinel');
+var Redis = require('ioredis');
+var ValidRedisCMDs = require('ioredis/commands');
+
 var cmdRespParser = require('../utils/cmdRespParser');
+var config = require('../config');
+
+// 检测 命令 是否有效
+function isValidCommand(cmd) {
+    cmd = cmd.toLowerCase();
+    return !!(cmd in ValidRedisCMDs);
+}
 
 /**
  *
@@ -16,14 +25,15 @@ var cmdRespParser = require('../utils/cmdRespParser');
  * @param res
  * @private
  */
-function _cmd(req, res) {
+
+function cmd(req, res) {
     /**
      * 请求参数:
      * 1. cmd: 大写的Redis命令
      * 2. params: 命令参数, 多个参数以空格分隔
      */
     var cmd = req.body.cmd.toUpperCase();
-    if (!cmd || !Sentinel.isValidCommand(cmd)) {
+    if (!cmd || !isValidCommand(cmd)) {
         res.toResponse('参数cmd不合法!', 400);
         return;
     }
@@ -33,7 +43,13 @@ function _cmd(req, res) {
         return;
     }
     params = params.split(' ');
-    var RedisServer = Sentinel.ActiveServer;
+
+    var RedisServer = new Redis({
+        sentinels: config.sentinels,
+        name: config.master_name,
+        password: config.auth
+    });
+
     RedisServer[cmd.toLocaleLowerCase()].apply(RedisServer, params).then(function(result) {
         if (cmd === 'INFO') {
             result = cmdRespParser.infoRespParser(result.split('\r\n'));
@@ -47,4 +63,4 @@ function _cmd(req, res) {
 /**
  * Module Exports
  */
-module.exports = _cmd;
+module.exports = cmd;
