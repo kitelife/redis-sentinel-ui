@@ -54,6 +54,8 @@ function cmd(req, res) {
         if (cmd === 'INFO') {
             result = cmdRespParser.infoRespParser(result.split('\r\n'));
         }
+        RedisServer.disconnect();
+
         res.toResponse(JSON.stringify(result, null, " "));
     }, function(err) {
         res.toResponse(JSON.stringify(err, null, " "));
