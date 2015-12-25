@@ -13,9 +13,9 @@ var statTitleMapper = {
 };
 
 function genErrorAlert(xhr) {
-    return '<div class="row"><div class="alert alert-danger error-tip col-md-6" role="alert">' +
+    return '<div class="alert alert-danger error-tip" role="alert">' +
         '<strong>'+ xhr.status +'</strong> - '  + xhr.statusText + '<p>' + xhr.responseText + '</p>'
-        + '</div></div>';
+        + '</div>';
 }
 
 $(function () {
