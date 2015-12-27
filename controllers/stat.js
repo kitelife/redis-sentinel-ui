@@ -104,7 +104,8 @@ function _reduceDataSet(dataSet, algorithm) {
         return _justFormatDataSet(dataSet);
     }
     var reducedDataSet = [];
-    for(var index = 0; index < dataSetLength; index = index+reduceFactor) {
+    var lastIndex = reduceFactor * DATA_POINT_THRESHOLD;
+    for(var index = 0; index < lastIndex; index = index+reduceFactor) {
         reducedDataSet.push(algorithm(dataSet, index, reduceFactor));
     }
     //
