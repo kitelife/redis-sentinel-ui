@@ -56,7 +56,7 @@ function _home(req, res) {
 
         var rawRedisServers = {};
         var redisMaster = clusterInfo.master;
-        if (redisMaster) {
+        if (redisMaster && Object.getOwnPropertyNames(redisMaster).length) {
             rawRedisServers[redisMaster.ip + ':' + redisMaster.port] = redisMaster;
         }
         var redisSlaves = clusterInfo.slaves;

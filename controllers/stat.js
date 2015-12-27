@@ -132,8 +132,6 @@ function _stat(req, res) {
     let statEndTime = req.body.end_time;
     let reduceWay = req.body.reduce_way;
 
-    console.log(reduceWay);
-
     if (statName === undefined || targetServers === undefined
         || statBeginTime === undefined || statEndTime === undefined) {
         res.toResponse('缺少必要的请求参数!', 400);
