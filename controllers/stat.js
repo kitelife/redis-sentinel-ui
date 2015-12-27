@@ -75,6 +75,15 @@ function _findReduceFactor(length) {
     return Math.floor(length / DATA_POINT_THRESHOLD);
 }
 
+/**
+ * 最大值化处理
+ * @param rangeDataSet
+ * @param beginIndex
+ * @param reduceFactor
+ * @param valueType
+ * @returns {*[]}
+ * @private
+ */
 function _byMax(rangeDataSet, beginIndex, reduceFactor, valueType) {
     var rangeMax = null;
     var upLimit = beginIndex + reduceFactor;
@@ -91,6 +100,15 @@ function _byMax(rangeDataSet, beginIndex, reduceFactor, valueType) {
     return [rangeMax.created_time, rangeMax.value];
 }
 
+/**
+ * 均值化处理
+ * @param rangeDataSet
+ * @param beginIndex
+ * @param reduceFactor
+ * @param valueType
+ * @returns {*[]}
+ * @private
+ */
 function _byAverage(rangeDataSet, beginIndex, reduceFactor, valueType) {
     var valueSum = 0;
     var upLimit = beginIndex + reduceFactor;
@@ -106,6 +124,14 @@ function _byAverage(rangeDataSet, beginIndex, reduceFactor, valueType) {
     return [rangeDataSet[beginIndex].created_time, aveValue];
 }
 
+/**
+ * 按选定算法对数据进行处理
+ * @param dataSet
+ * @param algorithm
+ * @param valueType
+ * @returns {Array}
+ * @private
+ */
 function _reduceDataSet(dataSet, algorithm, valueType) {
     var dataSetLength = dataSet.length;
     var reduceFactor = _findReduceFactor(dataSetLength);
@@ -127,6 +153,12 @@ function _reduceDataSet(dataSet, algorithm, valueType) {
     return reducedDataSet;
 }
 
+/**
+ * 对数据集进行格式转换
+ * @param dataSet
+ * @returns {Array}
+ * @private
+ */
 function _justFormatDataSet(dataSet) {
     var formatedDataSet = [];
     dataSet.forEach(data => {
