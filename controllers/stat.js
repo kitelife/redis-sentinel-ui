@@ -30,6 +30,13 @@ const graphTypeMapper = {
     }
 };
 
+const reduceAlgoMapper = {
+    ave: _byAverage,
+    max: _byMax
+};
+
+const DATA_POINT_THRESHOLD = 1000;
+
 function _checkStatName(statName) {
     return !!(statName in StatMapper);
 }
@@ -53,6 +60,59 @@ function _checkStatTimeRange(begin, end) {
     return !!(timeDiff <= 7 * 24 * 3600 && timeDiff >= 0);
 }
 
+function _findReduceFactor(length) {
+    if (length < DATA_POINT_THRESHOLD * 2) {
+        return 0;
+    }
+    return Math.floor(length / DATA_POINT_THRESHOLD);
+}
+
+function _byMax(rangeDataSet, beginIndex, reduceFactor) {
+    var rangeMax = null;
+    for(var index = beginIndex; index < reduceFactor; index++) {
+        var thisDataPoint = rangeDataSet[index];
+        if (rangeMax === null) {
+            rangeMax = thisDataPoint;
+            continue;
+        }
+        if (thisDataPoint.value > rangeMax.value) {
+            rangeMax = thisDataPoint;
+        }
+    }
+    return rangeMax;
+}
+
+function _byAverage(rangeDataSet, beginIndex, reduceFactor) {
+    var valueSum = 0;
+    for(var index = beginIndex; index < reduceFactor; index++) {
+        valueSum = rangeDataSet[index].value;
+    }
+    return {
+        created_time: rangeDataSet[beginIndex],
+        value: (valueSum / reduceFactor).toFixed(3)
+    }
+}
+
+function _reduceDataSet(dataSet, algorithm) {
+    var dataSetLength = dataSet.length;
+    var reduceFactor = _findReduceFactor(dataSetLength);
+    if (reduceFactor === 0) {
+        return dataSet;
+    }
+    var reducedDataSet = [];
+    for(var index = 0; index < dataSetLength; index = index+reduceFactor) {
+        reducedDataSet.push(algorithm(dataSet, index, reduceFactor));
+    }
+    //
+    var hasIteratedLength = reducedDataSet.length * reduceFactor;
+    if (hasIteratedLength < dataSetLength) {
+        for(var otherIndex = hasIteratedLength; otherIndex < dataSetLength; otherIndex++) {
+            reducedDataSet.push(dataSet[otherIndex]);
+        }
+    }
+    return reducedDataSet;
+}
+
 function _stat(req, res) {
     /**
      * 请求参数:
@@ -65,6 +125,7 @@ function _stat(req, res) {
     let targetServers = req.body.servers;
     let statBeginTime = req.body.begin_time;
     let statEndTime = req.body.end_time;
+    let reduceWay = req.body.reduce_way;
 
     if (statName === undefined || targetServers === undefined
         || statBeginTime === undefined || statEndTime === undefined) {
@@ -81,6 +142,10 @@ function _stat(req, res) {
     }
     if (_checkStatTimeRange(statBeginTime, statEndTime) === false) {
         res.toResponse('时间范围不合法! 应为: 0 < 结束时间点-开始时间点 < 7天', 400);
+        return;
+    }
+    if (reduceWay !== '' && !(reduceWay in reduceAlgoMapper)) {
+        res.toResponse('数据聚合方式不合法!', 400);
         return;
     }
     targetServers = targetServers.split(',');
@@ -108,6 +173,13 @@ function _stat(req, res) {
             series: []
         };
         Object.getOwnPropertyNames(targetSeriesData).forEach(server => {
+            var mySeriesData = null;
+            if (reduceWay) {
+                mySeriesData = _reduceDataSet(targetSeriesData[server], reduceAlgoMapper[reduceWay]);
+            } else {
+                mySeriesData = targetSeriesData[server];
+            }
+
             respData.series.push({
                 name: server,
                 type: graphTypeMapper[statName].type,
@@ -115,7 +187,7 @@ function _stat(req, res) {
                     enabled: false
                 },
                 lineWidth: 1.5,
-                data: targetSeriesData[server]
+                data: mySeriesData
             });
         });
 
