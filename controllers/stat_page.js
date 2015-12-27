@@ -10,7 +10,7 @@ var serverIndexs = {
 };
 
 var reduceWays = {
-    default: '默认不聚合',
+    default: '不聚合(时间范围大时慎重使用)',
     by_max: '最大值',
     by_ave: '均值'
 };
