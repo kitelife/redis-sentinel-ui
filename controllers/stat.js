@@ -115,6 +115,14 @@ function _reduceDataSet(dataSet, algorithm) {
     return reducedDataSet;
 }
 
+function _justFormatDataSet(dataSet) {
+    var formatedDataSet = [];
+    dataSet.forEach(data => {
+       formatedDataSet.push([data.created_time, data.value]);
+    });
+    return formatedDataSet;
+}
+
 function _stat(req, res) {
     /**
      * 请求参数:
@@ -177,7 +185,7 @@ function _stat(req, res) {
         Object.getOwnPropertyNames(targetSeriesData).forEach(server => {
             var mySeriesData = null;
             if (reduceWay === 'default') {
-                mySeriesData = targetSeriesData[server];
+                mySeriesData = _justFormatDataSet(targetSeriesData[server]);
             } else {
                 mySeriesData = _reduceDataSet(targetSeriesData[server], reduceAlgoMapper[reduceWay]);
             }
