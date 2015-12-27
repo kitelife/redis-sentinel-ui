@@ -117,7 +117,7 @@ function _byAverage(rangeDataSet, beginIndex, reduceFactor, valueType) {
     }
     var aveValue = null;
     if (valueType === 'int') {
-        aveValue = parseInt((valueSum/reduceFactor).toFixed(0));
+        aveValue = Math.ceil(valueSum/reduceFactor);
     } else {
         aveValue = parseFloat((valueSum / reduceFactor).toFixed(3));
     }
@@ -174,6 +174,7 @@ function _stat(req, res) {
      *  - server: 目标服务器
      *  - begin_time: 开始时间
      *  - end_time: 截止时间
+     *  - reduce_way: 数据处理方式
      */
     let statName = req.body.name;
     let targetServers = req.body.servers;
