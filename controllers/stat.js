@@ -80,19 +80,19 @@ function _byMax(rangeDataSet, beginIndex, reduceFactor) {
             rangeMax = thisDataPoint;
             continue;
         }
-        if (thisDataPoint[1] > rangeMax[1]) {
+        if (thisDataPoint.value > rangeMax.value) {
             rangeMax = thisDataPoint;
         }
     }
-    return rangeMax;
+    return [rangeMax.created_time, rangeMax.value];
 }
 
 function _byAverage(rangeDataSet, beginIndex, reduceFactor) {
     var valueSum = 0;
     for(var index = beginIndex; index < reduceFactor; index++) {
-        valueSum += rangeDataSet[index][1];
+        valueSum += rangeDataSet[index].value;
     }
-    return [rangeDataSet[beginIndex][0], (valueSum / reduceFactor).toFixed(3)];
+    return [rangeDataSet[beginIndex].created_time, parseFloat((valueSum / reduceFactor).toFixed(3))];
 }
 
 function _reduceDataSet(dataSet, algorithm) {
@@ -167,7 +167,7 @@ function _stat(req, res) {
             if (!(record.server in targetSeriesData)) {
                 targetSeriesData[record.server] = [];
             }
-            targetSeriesData[record.server].push([Date.parse(record.created_time), record.value]);
+            targetSeriesData[record.server].push({created_time: Date.parse(record.created_time), value: record.value});
         });
         var respData = {
             xAxis: graphTypeMapper[statName].xAxis ? graphTypeMapper[statName].xAxis : null,
