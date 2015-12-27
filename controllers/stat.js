@@ -17,16 +17,19 @@ const graphTypeMapper = {
         type: 'spline',
         yAxis: {
             allowDecimals: false
-        }
+        },
+        value_type: 'int'
     },
     'used_memory': {
-        type: 'area'
+        type: 'area',
+        value_type: 'float'
     },
     'cmd_ps': {
         type: 'spline',
         yAxis: {
             allowDecimals: false
-        }
+        },
+        value_type: 'int'
     }
 };
 
@@ -72,7 +75,7 @@ function _findReduceFactor(length) {
     return Math.floor(length / DATA_POINT_THRESHOLD);
 }
 
-function _byMax(rangeDataSet, beginIndex, reduceFactor) {
+function _byMax(rangeDataSet, beginIndex, reduceFactor, valueType) {
     var rangeMax = null;
     var upLimit = beginIndex + reduceFactor;
     for(var index = beginIndex; index < upLimit; index++) {
@@ -88,16 +91,22 @@ function _byMax(rangeDataSet, beginIndex, reduceFactor) {
     return [rangeMax.created_time, rangeMax.value];
 }
 
-function _byAverage(rangeDataSet, beginIndex, reduceFactor) {
+function _byAverage(rangeDataSet, beginIndex, reduceFactor, valueType) {
     var valueSum = 0;
     var upLimit = beginIndex + reduceFactor;
     for(var index = beginIndex; index < upLimit; index++) {
         valueSum += rangeDataSet[index].value;
     }
-    return [rangeDataSet[beginIndex].created_time, parseFloat((valueSum / reduceFactor).toFixed(3))];
+    var aveValue = null;
+    if (valueType === 'int') {
+        aveValue = parseInt((valueSum/reduceFactor).toFixed(0));
+    } else {
+        aveValue = parseFloat((valueSum / reduceFactor).toFixed(3));
+    }
+    return [rangeDataSet[beginIndex].created_time, aveValue];
 }
 
-function _reduceDataSet(dataSet, algorithm) {
+function _reduceDataSet(dataSet, algorithm, valueType) {
     var dataSetLength = dataSet.length;
     var reduceFactor = _findReduceFactor(dataSetLength);
     if (reduceFactor === 0) {
@@ -106,7 +115,7 @@ function _reduceDataSet(dataSet, algorithm) {
     var reducedDataSet = [];
     var lastIndex = reduceFactor * DATA_POINT_THRESHOLD;
     for(var index = 0; index < lastIndex; index = index+reduceFactor) {
-        reducedDataSet.push(algorithm(dataSet, index, reduceFactor));
+        reducedDataSet.push(algorithm(dataSet, index, reduceFactor, valueType));
     }
     //
     var hasIteratedLength = reducedDataSet.length * reduceFactor;
@@ -190,7 +199,8 @@ function _stat(req, res) {
             if (reduceWay === 'default') {
                 mySeriesData = _justFormatDataSet(targetSeriesData[server]);
             } else {
-                mySeriesData = _reduceDataSet(targetSeriesData[server], reduceAlgoMapper[reduceWay]);
+                mySeriesData = _reduceDataSet(targetSeriesData[server], reduceAlgoMapper[reduceWay],
+                    graphTypeMapper[statName].value_type);
             }
 
             respData.series.push({
