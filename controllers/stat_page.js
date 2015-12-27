@@ -3,6 +3,18 @@
 const Template = require('../utils/template');
 const DB = require('../models/db');
 
+var serverIndexs = {
+    connected_client: '客户端连接数',
+    used_memory: '内存使用量',
+    cmd_ps: '每秒处理命令数'
+};
+
+var reduceWays = {
+    default: '默认不聚合',
+    by_max: '最大值',
+    by_ave: '均值'
+};
+
 function _stat_page(req, res) {
     DB.getClusterInfo(function (err, result) {
 
@@ -13,14 +25,9 @@ function _stat_page(req, res) {
             return;
         }
 
-        var redisServers = [],
-            serverIndexs = {
-                'connected_client': '客户端连接数',
-                'used_memory': '内存使用量',
-                'cmd_ps': '每秒处理命令数'
-            };
-        var redisMaster = JSON.parse(result.master),
-            redisSlaves = JSON.parse(result.slaves);
+        var redisServers = [];
+        var redisMaster = JSON.parse(result.master);
+        var redisSlaves = JSON.parse(result.slaves);
 
         redisServers.push(redisMaster.ip + ':' + redisMaster.port);
         Object.getOwnPropertyNames(redisSlaves).forEach(slave => {
@@ -29,7 +36,8 @@ function _stat_page(req, res) {
 
         res.write(Template.render('views/stat.jade', {
             servers: redisServers,
-            indexs: serverIndexs
+            indexs: serverIndexs,
+            ways: reduceWays
         }));
         res.end();
     });

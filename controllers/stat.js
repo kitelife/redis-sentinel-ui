@@ -31,14 +31,19 @@ const graphTypeMapper = {
 };
 
 const reduceAlgoMapper = {
-    ave: _byAverage,
-    max: _byMax
+    default: null,
+    by_ave: _byAverage,
+    by_max: _byMax
 };
 
 const DATA_POINT_THRESHOLD = 1000;
 
 function _checkStatName(statName) {
     return !!(statName in StatMapper);
+}
+
+function _checkReduceWay(reduceWay) {
+    return !!(reduceWay in reduceAlgoMapper);
 }
 
 function _checkStatTime(begin, end) {
@@ -127,6 +132,8 @@ function _stat(req, res) {
     let statEndTime = req.body.end_time;
     let reduceWay = req.body.reduce_way;
 
+    console.log(reduceWay);
+
     if (statName === undefined || targetServers === undefined
         || statBeginTime === undefined || statEndTime === undefined) {
         res.toResponse('缺少必要的请求参数!', 400);
@@ -144,7 +151,7 @@ function _stat(req, res) {
         res.toResponse('时间范围不合法! 应为: 0 < 结束时间点-开始时间点 < 7天', 400);
         return;
     }
-    if (reduceWay !== '' && !(reduceWay in reduceAlgoMapper)) {
+    if (_checkReduceWay(reduceWay) === false) {
         res.toResponse('数据聚合方式不合法!', 400);
         return;
     }
@@ -174,10 +181,10 @@ function _stat(req, res) {
         };
         Object.getOwnPropertyNames(targetSeriesData).forEach(server => {
             var mySeriesData = null;
-            if (reduceWay) {
-                mySeriesData = _reduceDataSet(targetSeriesData[server], reduceAlgoMapper[reduceWay]);
-            } else {
+            if (reduceWay === 'default') {
                 mySeriesData = targetSeriesData[server];
+            } else {
+                mySeriesData = _reduceDataSet(targetSeriesData[server], reduceAlgoMapper[reduceWay]);
             }
 
             respData.series.push({

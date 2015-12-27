@@ -87,6 +87,8 @@ $(function () {
             }
         });
 
+        var reduceWay = $('input[name="reduce_way"]:checked').val();
+
         var beginDateTime = $('input[name="begin-datetime"]').val();
         var endDateTime = $('input[name="end-datetime"]').val();
 
@@ -116,7 +118,8 @@ $(function () {
                     name: ele,
                     servers: selectedServer.join(','),
                     begin_time: beginDateTime,
-                    end_time: endDateTime
+                    end_time: endDateTime,
+                    reduce_way: reduceWay
                 },
                 dataType: 'json'
             });
