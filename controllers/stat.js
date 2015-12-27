@@ -92,7 +92,7 @@ function _byAverage(rangeDataSet, beginIndex, reduceFactor) {
     for(var index = beginIndex; index < reduceFactor; index++) {
         valueSum = rangeDataSet[index][1];
     }
-    return [rangeDataSet[beginIndex], (valueSum / reduceFactor).toFixed(3)];
+    return [rangeDataSet[beginIndex][0], (valueSum / reduceFactor).toFixed(3)];
 }
 
 function _reduceDataSet(dataSet, algorithm) {
