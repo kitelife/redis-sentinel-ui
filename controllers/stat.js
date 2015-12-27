@@ -74,7 +74,8 @@ function _findReduceFactor(length) {
 
 function _byMax(rangeDataSet, beginIndex, reduceFactor) {
     var rangeMax = null;
-    for(var index = beginIndex; index < reduceFactor; index++) {
+    var upLimit = beginIndex + reduceFactor;
+    for(var index = beginIndex; index < upLimit; index++) {
         var thisDataPoint = rangeDataSet[index];
         if (rangeMax === null) {
             rangeMax = thisDataPoint;
@@ -89,7 +90,8 @@ function _byMax(rangeDataSet, beginIndex, reduceFactor) {
 
 function _byAverage(rangeDataSet, beginIndex, reduceFactor) {
     var valueSum = 0;
-    for(var index = beginIndex; index < reduceFactor; index++) {
+    var upLimit = beginIndex + reduceFactor;
+    for(var index = beginIndex; index < upLimit; index++) {
         valueSum += rangeDataSet[index].value;
     }
     return [rangeDataSet[beginIndex].created_time, parseFloat((valueSum / reduceFactor).toFixed(3))];
@@ -99,7 +101,7 @@ function _reduceDataSet(dataSet, algorithm) {
     var dataSetLength = dataSet.length;
     var reduceFactor = _findReduceFactor(dataSetLength);
     if (reduceFactor === 0) {
-        return dataSet;
+        return _justFormatDataSet(dataSet);
     }
     var reducedDataSet = [];
     for(var index = 0; index < dataSetLength; index = index+reduceFactor) {
@@ -109,7 +111,7 @@ function _reduceDataSet(dataSet, algorithm) {
     var hasIteratedLength = reducedDataSet.length * reduceFactor;
     if (hasIteratedLength < dataSetLength) {
         for(var otherIndex = hasIteratedLength; otherIndex < dataSetLength; otherIndex++) {
-            reducedDataSet.push(dataSet[otherIndex]);
+            reducedDataSet.push([dataSet[otherIndex].created_time, dataSet[otherIndex].value]);
         }
     }
     return reducedDataSet;
