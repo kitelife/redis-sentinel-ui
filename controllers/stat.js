@@ -80,7 +80,7 @@ function _byMax(rangeDataSet, beginIndex, reduceFactor) {
             rangeMax = thisDataPoint;
             continue;
         }
-        if (thisDataPoint.value > rangeMax.value) {
+        if (thisDataPoint[1] > rangeMax[1]) {
             rangeMax = thisDataPoint;
         }
     }
@@ -90,12 +90,9 @@ function _byMax(rangeDataSet, beginIndex, reduceFactor) {
 function _byAverage(rangeDataSet, beginIndex, reduceFactor) {
     var valueSum = 0;
     for(var index = beginIndex; index < reduceFactor; index++) {
-        valueSum = rangeDataSet[index].value;
+        valueSum = rangeDataSet[index][1];
     }
-    return {
-        created_time: rangeDataSet[beginIndex],
-        value: (valueSum / reduceFactor).toFixed(3)
-    }
+    return [rangeDataSet[beginIndex], (valueSum / reduceFactor).toFixed(3)];
 }
 
 function _reduceDataSet(dataSet, algorithm) {
