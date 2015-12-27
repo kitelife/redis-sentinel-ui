@@ -18,7 +18,6 @@ html
         link(rel='stylesheet', href='/public/vendor/bootstrap/css/bootstrap.min.css')
         link(rel='stylesheet', href='/public/vendor/bootstrap/css/bootstrap-theme.min.css')
         link(rel='stylesheet', href='/public/main.css')
-        script(src='/public/dist/main.js')
         block head_css
         block head_js
     body
@@ -26,3 +25,4 @@ html
           include header
           block content
           include footer
+        script(src='/public/dist/main.js')
