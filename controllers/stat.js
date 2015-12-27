@@ -90,7 +90,7 @@ function _byMax(rangeDataSet, beginIndex, reduceFactor) {
 function _byAverage(rangeDataSet, beginIndex, reduceFactor) {
     var valueSum = 0;
     for(var index = beginIndex; index < reduceFactor; index++) {
-        valueSum = rangeDataSet[index][1];
+        valueSum += rangeDataSet[index][1];
     }
     return [rangeDataSet[beginIndex][0], (valueSum / reduceFactor).toFixed(3)];
 }
