@@ -22,7 +22,7 @@ function genErrorAlert(xhr) {
 $(function () {
     $('#begin_datetime').datetimepicker({
         format: 'YYYY-MM-DD HH:mm:ss',
-        defaultDate: new Date(Date.now() - (60 * 60 * 24 * 1000)),
+        defaultDate: new Date(Date.now() - (60 * 60 * 12 * 1000)),
         sideBySide: true
     });
     $('#end_datetime').datetimepicker({

@@ -4,9 +4,9 @@ const Template = require('../utils/template');
 const DB = require('../models/db');
 
 var serverIndexs = {
+    cmd_ps: '每秒处理命令数',
     connected_client: '客户端连接数',
-    used_memory: '内存使用量',
-    cmd_ps: '每秒处理命令数'
+    used_memory: '内存使用量'
 };
 
 var reduceWays = {
