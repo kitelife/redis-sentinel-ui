@@ -5,13 +5,14 @@ block content
     each server in servers
         div(class=["checkbox", "server"])
             label
-                input(type="checkbox", value="#{server}")
+                input(type="checkbox", value="#{server}" checked=true)
                 span #{server}
     h4 选择指标：
     each v, k in indexs
         div(class=["checkbox", "index"])
             label
-                input(type="checkbox", value="#{k}")
+                - var isCMDPS = k === 'cmd_ps'
+                input(type="checkbox", value="#{k}" checked=isCMDPS)
                 span #{v}
     h4 选择聚合方式：
     each v, k in ways

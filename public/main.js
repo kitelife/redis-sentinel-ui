@@ -20,10 +20,12 @@ function genErrorAlert(xhr) {
 
 $(function () {
     $('#begin_datetime').datetimepicker({
-        format: 'YYYY-MM-DD HH:mm:ss'
+        format: 'YYYY-MM-DD HH:mm:ss',
+        defaultDate: new Date(Date.now() - (60 * 60 * 24 * 1000))
     });
     $('#end_datetime').datetimepicker({
-        format: 'YYYY-MM-DD HH:mm:ss'
+        format: 'YYYY-MM-DD HH:mm:ss',
+        useCurrent: true
     });
 
     $('#submit_cmd').on('click', function ($e) {
