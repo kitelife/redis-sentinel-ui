@@ -20,6 +20,11 @@ gulp.task('clone', () => {
             './node_modules/bootstrap/dist/fonts/**/*.*'
         ], {base: './node_modules/bootstrap/dist'})
         .pipe(gulp.dest('./public/vendor/bootstrap'));
+
+    gulp.src([
+        './node_modules/cn-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css'
+    ], {base: './node_modules/cn-bootstrap-datetimepicker/build/css'})
+    .pipe(gulp.dest('./public/vendor'));
 });
 
 gulp.task('default', ['browserify', 'clone']);
