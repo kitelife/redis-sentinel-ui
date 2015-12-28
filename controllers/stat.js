@@ -49,23 +49,32 @@ function _checkReduceWay(reduceWay) {
     return !!(reduceWay in reduceAlgoMapper);
 }
 
+function _diffTime(begin, end) {
+    let beginTimestamp = Date.parse(begin);
+    let endTimestamp = Date.parse(end);
+    return (endTimestamp - beginTimestamp) / 1000;
+}
+
 function _checkStatTime(begin, end) {
     // 时间戳格式: "xxxx-xx-xx xx:xx:xx"
     let regexPattern = /\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/;
-    if (begin.match(regexPattern) === null || end.match(regexPattern) === null) {
+    let timeDiff = _diffTime(begin, end);
+
+    if (begin.match(regexPattern) === null || end.match(regexPattern) === null || timeDiff <= 0) {
         return false;
     }
     return true;
 }
 
-function _checkStatTimeRange(begin, end) {
-    let beginTimestamp = Date.parse(begin);
-    let endTimestamp = Date.parse(end);
+function _checkStatTimeRange(begin, end, reduceWay) {
+    let timeDiff = _diffTime(begin, end);
 
-    let timeDiff = (endTimestamp - beginTimestamp) / 1000;
-
-    // 考虑性能, 限制只能获取一周范围的数据
-    return !!(timeDiff <= 7 * 24 * 3600 && timeDiff >= 0);
+    if (reduceWay === 'default') {
+        // 考虑性能, 限制只能获取3天范围的数据
+        return timeDiff <= 3 * 24 * 3600;
+    } else {
+        return timeDiff <= 30 * 24 * 3600;
+    }
 }
 
 function _findReduceFactor(length) {
@@ -195,12 +204,12 @@ function _stat(req, res) {
         res.toResponse('参数statBeginTime或statEndTime不合法!', 400);
         return;
     }
-    if (_checkStatTimeRange(statBeginTime, statEndTime) === false) {
-        res.toResponse('时间范围不合法! 应为: 0 < 结束时间点-开始时间点 < 7天', 400);
-        return;
-    }
     if (_checkReduceWay(reduceWay) === false) {
         res.toResponse('数据聚合方式不合法!', 400);
+        return;
+    }
+    if ( _checkStatTimeRange(statBeginTime, statEndTime, reduceWay) === false) {
+        res.toResponse('时间范围不合法!', 400);
         return;
     }
     targetServers = targetServers.split(',');
