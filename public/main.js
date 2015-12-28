@@ -2,7 +2,8 @@
  * Created by xiayf on 15/12/4.
  */
 var $ = jQuery = require('jquery');
-var _ = require('cn-bootstrap-datetimepicker');
+var _ = require('bootstrap');
+var __ = require('cn-bootstrap-datetimepicker');
 var Highcharts = require('highcharts');
 Highcharts.setOptions({ global: { useUTC: false } });
 
