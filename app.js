@@ -30,5 +30,5 @@ if (cluster.isMaster) {
     // Workers can share any TCP connection
     // In this case it is an HTTP server
     http.createServer(routes).listen(config.port);
-    Logger.info('进程id:', process.pid, ', 监听端口:', config.port);
+    Logger.info('进程id:', process.pid, '监听端口:', config.port);
 }
