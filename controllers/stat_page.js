@@ -1,7 +1,8 @@
 'use strict';
 
-const Template = require('../utils/template');
-const DB = require('../models/db');
+var Template = require('../utils/template');
+var DB = require('../models/db');
+var Logger = require('../utils/logger');
 
 var serverIndexs = {
     cmd_ps: '每秒处理命令数',
@@ -17,8 +18,9 @@ var reduceWays = {
 
 function _stat_page(req, res) {
     DB.getClusterInfo(function (err, result) {
-
         if (err) {
+            Logger.error(err);
+
             res.statusCode = 500;
             res.write('系统异常,请联系管理员');
             res.end();

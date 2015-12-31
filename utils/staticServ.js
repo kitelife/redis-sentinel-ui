@@ -17,6 +17,7 @@ var path = require('path');
 var mime = require('mime-types');
 var debug = require('debug')('staticServ');
 var config = require('../config');
+var Logger = require('./logger');
 
 var staticFileObjs = Object.create(null);
 var staticDir = path.join(global.RootDir, 'public');
@@ -144,6 +145,8 @@ function staticService(pathname, callback) {
     try {
         var fileStat = fs.statSync(filePath);
     } catch (err) {
+        Logger.error(err);
+
         callback({code: 500, msg: '系统异常'});
         return;
     }

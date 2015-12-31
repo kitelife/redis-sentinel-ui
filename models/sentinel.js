@@ -14,6 +14,7 @@ var Redis = require('ioredis');
 var DB = require('./db');
 var config = require('../config');
 var cmdRespParser = require('../utils/cmdRespParser');
+var Logger = require('../utils/logger');
 
 // 1M = 1024 * 1024;
 const oneM = 1048576;
@@ -142,7 +143,7 @@ function _fetchClusterInfo() {
         sentinelIndex++;
     }
     if (activeSentinel === null) {
-        console.error('Now has no active sentinel');
+        Logger.error('Now has no active sentinel');
         return;
     }
 
@@ -155,7 +156,7 @@ function _fetchClusterInfo() {
 
     sentinelInstance.sentinel('master', config.master_name, (err, result) => {
         if (err) {
-            console.error(err);
+            Logger.error(err);
             return;
         }
         ClusterInfo.master = _parseSentinelSingle(result);
@@ -174,7 +175,7 @@ function _fetchClusterInfo() {
 
     sentinelInstance.sentinel('slaves', config.master_name, (err, result) => {
         if (err) {
-            console.error(err);
+            Logger.error(err);
             return;
         }
         ClusterInfo.slaves = _parseSentinelMulti(result);

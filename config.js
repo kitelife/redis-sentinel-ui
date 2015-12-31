@@ -15,6 +15,7 @@ const STORAGE_FILE_PATH = './rsm.db';
 
 var configuration = {
     debug: false,
+    log_level: 'debug',
     port: PORT,
     static_prefix: '/public/',
     sentinels: [
@@ -43,4 +44,3 @@ var configuration = {
  */
 
 module.exports = configuration;
-

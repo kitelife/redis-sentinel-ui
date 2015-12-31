@@ -7,9 +7,10 @@
 
 'use strict';
 
-const DB = require('../models/db');
-const Template = require('../utils/template');
-const Time = require('../utils/time');
+var DB = require('../models/db');
+var Template = require('../utils/template');
+var Time = require('../utils/time');
+var Logger = require('../utils/logger');
 
 /**
  * `/home`控制器
@@ -20,6 +21,8 @@ const Time = require('../utils/time');
 function _home(req, res) {
     DB.getClusterInfo(function(err, result) {
         if (err) {
+            Logger.error(err);
+
             res.statusCode = 500;
             res.write('系统异常,请联系管理员');
             res.end();
@@ -27,6 +30,8 @@ function _home(req, res) {
         }
 
         if (!result) {
+            Logger.info('Has no cluster info');
+            
             result = {master: '{}', slaves: '{}', sentinels: '{}'};
         }
 

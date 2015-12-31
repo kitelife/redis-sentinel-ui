@@ -4,15 +4,15 @@
 
 'use strict';
 
-const DB = require('../models/db');
+var DB = require('../models/db');
 
-const StatMapper = {
+var StatMapper = {
     'connected_client': DB.getRangeConnectedClient,
     'used_memory': DB.getRangeUsedMemory,
     'cmd_ps': DB.getRangeCMDPS
 };
 
-const graphTypeMapper = {
+var graphTypeMapper = {
     'connected_client': {
         type: 'spline',
         yAxis: {
@@ -33,13 +33,13 @@ const graphTypeMapper = {
     }
 };
 
-const reduceAlgoMapper = {
+var reduceAlgoMapper = {
     default: null,
     by_ave: _byAverage,
     by_max: _byMax
 };
 
-const DATA_POINT_THRESHOLD = 1000;
+var DATA_POINT_THRESHOLD = 1000;
 
 function _checkStatName(statName) {
     return !!(statName in StatMapper);

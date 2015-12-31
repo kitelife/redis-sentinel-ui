@@ -7,18 +7,19 @@
 
 'use strict';
 
-const fs = require('fs');
-const urlParser = require('url');
-const qs = require('querystring');
+var fs = require('fs');
+var urlParser = require('url');
+//const qs = require('querystring');
 
-const Parser = require('co-body');
+var Parser = require('co-body');
 
-const controllers = require('./controllers');
-const StaticServ = require('./utils/staticServ');
-const RespUtil = require('./utils/resp');
+var controllers = require('./controllers');
+var StaticServ = require('./utils/staticServ');
+var RespUtil = require('./utils/resp');
+var Logger = require('./utils/logger');
 
 // Web路由
-const routes = {
+var routes = {
     '/': {
         'verb': ['GET'],
         'action': controllers.Home
@@ -60,8 +61,10 @@ function* _parseReqBody(req) {
 }
 
 function _router(req, res) {
-    let urlParts = urlParser.parse(req.url);
+    let urlParts = urlParser.parse(req.url, true);
     let pathname = urlParts.pathname;
+
+    Logger.info('%s %s', req.method, pathname);
 
     // 输出请求路径及方法
     // console.log(pathname, req.method);
@@ -72,7 +75,8 @@ function _router(req, res) {
     // 匹配路由表
     if ((pathname in routes) && (routes[pathname].verb.indexOf(req.method) != -1)) {
         // 统一解析保存URL查询字符串的请求参数
-        req.query = qs.parse(urlParts.query);
+        // req.query = qs.parse(urlParts.query);
+        req.query = urlParts.query;
 
         if (req.method === 'POST' || req.method === 'PUT') {
             // 统一解析并保存请求体数据
@@ -91,6 +95,8 @@ function _router(req, res) {
 
     StaticServ(pathname, function(err, result) {
         if (err) {
+            Logger.error(err);
+
             res.toResponse(err.msg, err.code);
             return;
         }

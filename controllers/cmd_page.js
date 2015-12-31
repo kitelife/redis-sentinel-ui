@@ -2,7 +2,7 @@
 
 var ValidRedisCMDs = require('ioredis/commands');
 
-const Template = require('../utils/template');
+var Template = require('../utils/template');
 
 function _cmd_page(req, res) {
     res.write(Template.render('views/cmd.jade', {
