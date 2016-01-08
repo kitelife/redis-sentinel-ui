@@ -19,8 +19,10 @@ var create_sentinels_sql = `
         status TEXT NOT NULL DEFAULT 'OFF'
     );
 `;
-db.run(create_sentinels_sql);
-db.run('DELETE FROM sentinels');
+db.serialize(function() {
+    db.run(create_sentinels_sql);
+    db.run('DELETE FROM sentinels');
+});
 
 var create_clusterinfo_sql = `
     CREATE TABLE IF NOT EXISTS cluster_info (
@@ -30,9 +32,11 @@ var create_clusterinfo_sql = `
         sentinels TEXT NOT NULL DEFAULT '{}'
     )
 `;
-db.run(create_clusterinfo_sql);
-db.run('DELETE FROM cluster_info');
-db.run('INSERT INTO `cluster_info` (`master_name`) VALUES (?)', config.master_name);
+db.serialize(function() {
+    db.run(create_clusterinfo_sql);
+    db.run('DELETE FROM cluster_info');
+    db.run('INSERT INTO `cluster_info` (`master_name`) VALUES (?)', config.master_name);
+});
 
 var create_connected_client = `
 CREATE TABLE IF NOT EXISTS connected_client (
@@ -69,3 +73,5 @@ CREATE TABLE IF NOT EXISTS cmd_ps (
 db.run(create_cmd_per_second);
 // 手动添加索引
 // CREATE INDEX cmd_ps_server_idx ON cmd_ps (server);
+
+db.close();
