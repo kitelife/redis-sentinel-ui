@@ -15,23 +15,8 @@ var StdUtil = require('util');
 var config = require('../config');
 var sqlite3 = require('sqlite3').verbose();
 
-var db = new sqlite3.Database(config.storage_file);
-
-/**
- * 更新数据库中sentinel的状态
- *
- * @param sentinel_addr
- * @param status
- * @param callback
- * @private
- */
-function _updateSentinelStatus(sentinel_addr, status, callback) {
-    db.run('REPLACE INTO `sentinels` (`sentinel`, `status`) VALUES (?, ?)',
-        sentinel_addr,
-        status,
-        callback
-    );
-}
+// 只读模式
+var db = new sqlite3.Database(config.storage_file, sqlite3.OPEN_READONLY);
 
 /**
  * 从数据库中获取某个sentinel的状态
@@ -59,24 +44,11 @@ function _getActiveSentinel(callback) {
     );
 }
 
-
-function _saveClusterPart(partData, partName) {
-    partData = JSON.stringify(partData);
-    var masterName = config.master_name;
-    var sql = StdUtil.format('UPDATE `cluster_info` SET `%s`=? WHERE `master_name`=?', partName);
-    db.run(sql, partData, masterName);
-}
-
 function _getClusterInfo(callback) {
     var masterName = config.master_name;
     db.get('SELECT master, slaves, sentinels FROM `cluster_info` WHERE master_name=?',
         masterName, callback
     );
-}
-
-function _addNewConnectedClient(server, clientNum) {
-    db.run('INSERT INTO `connected_client` (`server`, `client_num`) VALUES (?, ?)',
-        server, clientNum);
 }
 
 function _getRangeConnectedClient(servers, beginTime, endTime, callback) {
@@ -98,11 +70,6 @@ function _getRangeConnectedClient(servers, beginTime, endTime, callback) {
     db.all.apply(db, stmtParams);
 }
 
-function _addNewUsedMemory(server, usedMemory) {
-    db.run('INSERT INTO `used_memory` (`server`, `used_memory`) VALUES (?, ?)',
-        server, usedMemory);
-}
-
 function _getRangeUsedMemory(servers, beginTime, endTime, callback) {
     var serverCount = servers.length;
 
@@ -120,10 +87,6 @@ function _getRangeUsedMemory(servers, beginTime, endTime, callback) {
     stmtParams.push(callback);
 
     db.all.apply(db, stmtParams);
-}
-
-function _addNewCMDPS(server, cmd_ps) {
-    db.run('INSERT INTO `cmd_ps` (`server`, `cmd_ps`) VALUES (?, ?)', server, cmd_ps);
 }
 
 function _getRangeCMDPS(servers, beginTime, endTime, callback) {
@@ -148,14 +111,9 @@ function _getRangeCMDPS(servers, beginTime, endTime, callback) {
 /**
  * Module Exports
  */
-exports.updateSentinelStatus = _updateSentinelStatus;
 exports.getPrev = _getSentinelPreviousStatus;
 exports.getActive = _getActiveSentinel;
-exports.saveClusterPart = _saveClusterPart;
 exports.getClusterInfo = _getClusterInfo;
-exports.addNewConnectedClient = _addNewConnectedClient;
 exports.getRangeConnectedClient = _getRangeConnectedClient;
-exports.addNewUsedMemory = _addNewUsedMemory;
 exports.getRangeUsedMemory = _getRangeUsedMemory;
-exports.addNewCMDPS = _addNewCMDPS;
 exports.getRangeCMDPS = _getRangeCMDPS;

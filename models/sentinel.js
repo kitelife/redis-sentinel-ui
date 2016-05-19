@@ -10,11 +10,52 @@
 'use strict';
 
 var Redis = require('ioredis');
-
-var DB = require('./db');
+var sqlite3 = require('sqlite3').verbose();
 var config = require('../config');
 var cmdRespParser = require('../utils/cmdRespParser');
 var Logger = require('../utils/logger');
+
+// 模式默认：OPEN_READWRITE | OPEN_CREATE
+var db = new sqlite3.Database(config.storage_file);
+
+/**
+ * 更新数据库中sentinel的状态
+ *
+ * @param sentinel_addr
+ * @param status
+ * @param callback
+ * @private
+ */
+var updateSentinelStatus = function (sentinel_addr, status, callback) {
+    db.run('REPLACE INTO `sentinels` (`sentinel`, `status`) VALUES (?, ?)',
+        sentinel_addr,
+        status,
+        callback
+    );
+}
+
+var saveClusterPart = function (partData, partName) {
+    partData = JSON.stringify(partData);
+    var masterName = config.master_name;
+    var sql = StdUtil.format('UPDATE `cluster_info` SET `%s`=? WHERE `master_name`=?', partName);
+    db.run(sql, partData, masterName);
+}
+
+var addNewConnectedClient = function (server, clientNum) {
+    db.run('INSERT INTO `connected_client` (`server`, `client_num`) VALUES (?, ?)',
+        server, clientNum);
+}
+
+var addNewUsedMemory = function (server, usedMemory) {
+    db.run('INSERT INTO `used_memory` (`server`, `used_memory`) VALUES (?, ?)',
+        server, usedMemory);
+}
+
+var addNewCMDPS = function (server, cmd_ps) {
+    db.run('INSERT INTO `cmd_ps` (`server`, `cmd_ps`) VALUES (?, ?)', server, cmd_ps);
+}
+
+
 
 // 1M = 1024 * 1024;
 const oneM = 1048576;
@@ -111,7 +152,7 @@ function _connAndInfo(host, port, group) {
         }
 
         // 同步到数据库
-        DB.saveClusterPart(ClusterInfo[group], group);
+        saveClusterPart(ClusterInfo[group], group);
         //
         redisServer.disconnect();
     });
@@ -254,7 +295,7 @@ function _updateSentinelStatus() {
             }
 
             AllSentinelStatus[sentinelAddress] = sentinelStatus;
-            DB.updateSentinelStatus(sentinelAddress, sentinelStatus);
+            updateSentinelStatus(sentinelAddress, sentinelStatus);
         });
     });
 }
@@ -274,9 +315,9 @@ function _collectServerInfo() {
 
         newRedisConn.info().then(resp => {
             let parsedResp = cmdRespParser.infoRespParser(resp.split('\r\n'));
-            DB.addNewConnectedClient(addr, parsedResp['connected_clients']);
-            DB.addNewUsedMemory(addr, (parsedResp['used_memory'] / oneM).toFixed(3));
-            DB.addNewCMDPS(addr, parsedResp['instantaneous_ops_per_sec']);
+            addNewConnectedClient(addr, parsedResp['connected_clients']);
+            addNewUsedMemory(addr, (parsedResp['used_memory'] / oneM).toFixed(3));
+            addNewCMDPS(addr, parsedResp['instantaneous_ops_per_sec']);
             //
             newRedisConn.disconnect();
         });
