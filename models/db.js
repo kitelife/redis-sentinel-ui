@@ -10,8 +10,6 @@
 
 'use strict';
 
-var StdUtil = require('util');
-
 var config = require('../config');
 var sqlite3 = require('sqlite3').verbose();
 
