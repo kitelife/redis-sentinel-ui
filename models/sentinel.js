@@ -10,6 +10,7 @@
 'use strict';
 
 var Redis = require('ioredis');
+var StdUtil = require('util');
 var sqlite3 = require('sqlite3').verbose();
 var config = require('../config');
 var cmdRespParser = require('../utils/cmdRespParser');
