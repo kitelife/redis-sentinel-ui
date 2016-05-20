@@ -6,7 +6,7 @@
 2. `cd redis-sentinel-ui && npm install`
 3. `gulp default`
 4. 数据库初始化: `node init.js`
-5. 启动后台redis监控数据收集进程: `node god.js`
+5. 启动后台redis监控数据收集进程: `node monitor/god.js`
 6. 启用web应用进程: `node app.js`
 
 ## 截图

@@ -4,8 +4,8 @@
 
 'use strict';
 
-var RedisSentinel = require('./models/sentinel');
-var config = require('./config');
+var RedisSentinel = require('./sentinel');
+var config = require('../config');
 
 // 先获取一下
 setTimeout(RedisSentinel.update_sentinel_status, 3000);
