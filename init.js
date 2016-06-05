@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * Created by xiayf on 15/12/24.
  */
