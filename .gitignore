@@ -6,3 +6,4 @@ public/vendor/
 node_modules/
 rsm.db
 npm-debug.log
+.vscode/

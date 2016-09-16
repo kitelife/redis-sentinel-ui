@@ -33,28 +33,28 @@ var updateSentinelStatus = function (sentinel_addr, status, callback) {
         status,
         callback
     );
-}
+};
 
 var saveClusterPart = function (partData, partName) {
     partData = JSON.stringify(partData);
     var masterName = config.master_name;
     var sql = StdUtil.format('UPDATE `cluster_info` SET `%s`=? WHERE `master_name`=?', partName);
     db.run(sql, partData, masterName);
-}
+};
 
 var addNewConnectedClient = function (server, clientNum) {
     db.run('INSERT INTO `connected_client` (`server`, `client_num`) VALUES (?, ?)',
         server, clientNum);
-}
+};
 
 var addNewUsedMemory = function (server, usedMemory) {
     db.run('INSERT INTO `used_memory` (`server`, `used_memory`) VALUES (?, ?)',
         server, usedMemory);
-}
+};
 
 var addNewCMDPS = function (server, cmd_ps) {
     db.run('INSERT INTO `cmd_ps` (`server`, `cmd_ps`) VALUES (?, ?)', server, cmd_ps);
-}
+};
 
 
 
