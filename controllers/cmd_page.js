@@ -1,8 +1,8 @@
 'use strict';
 
-var ValidRedisCMDs = require('ioredis/commands');
+let ValidRedisCMDs = require('ioredis/commands');
 
-var Template = require('../utils/template');
+let Template = require('../utils/template');
 
 function _cmd_page(req, res) {
     res.write(Template.render('views/cmd.jade', {

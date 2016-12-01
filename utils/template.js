@@ -10,7 +10,7 @@
 const path = require('path');
 const jade = require('jade');
 
-var templateCache = {};
+let templateCache = {};
 
 /**
  *

@@ -4,15 +4,15 @@
 
 'use strict';
 
-var DB = require('../models/db');
+let DB = require('../models/db');
 
-var StatMapper = {
+let StatMapper = {
     'connected_client': DB.getRangeConnectedClient,
     'used_memory': DB.getRangeUsedMemory,
     'cmd_ps': DB.getRangeCMDPS
 };
 
-var graphTypeMapper = {
+let graphTypeMapper = {
     'connected_client': {
         type: 'spline',
         yAxis: {
@@ -33,13 +33,13 @@ var graphTypeMapper = {
     }
 };
 
-var reduceAlgoMapper = {
+let reduceAlgoMapper = {
     default: null,
     by_ave: _byAverage,
     by_max: _byMax
 };
 
-var DATA_POINT_THRESHOLD = 1000;
+let DATA_POINT_THRESHOLD = 1000;
 
 function _checkStatName(statName) {
     return !!(statName in StatMapper);
@@ -94,10 +94,10 @@ function _findReduceFactor(length) {
  * @private
  */
 function _byMax(rangeDataSet, beginIndex, reduceFactor, valueType) {
-    var rangeMax = null;
-    var upLimit = beginIndex + reduceFactor;
-    for(var index = beginIndex; index < upLimit; index++) {
-        var thisDataPoint = rangeDataSet[index];
+    let rangeMax = null;
+    let upLimit = beginIndex + reduceFactor;
+    for(let index = beginIndex; index < upLimit; index++) {
+        let thisDataPoint = rangeDataSet[index];
         if (rangeMax === null) {
             rangeMax = thisDataPoint;
             continue;
@@ -119,12 +119,12 @@ function _byMax(rangeDataSet, beginIndex, reduceFactor, valueType) {
  * @private
  */
 function _byAverage(rangeDataSet, beginIndex, reduceFactor, valueType) {
-    var valueSum = 0;
-    var upLimit = beginIndex + reduceFactor;
-    for(var index = beginIndex; index < upLimit; index++) {
+    let valueSum = 0;
+    let upLimit = beginIndex + reduceFactor;
+    for(let index = beginIndex; index < upLimit; index++) {
         valueSum += rangeDataSet[index].value;
     }
-    var aveValue = null;
+    let aveValue = null;
     if (valueType === 'int') {
         aveValue = Math.ceil(valueSum/reduceFactor);
     } else {
@@ -142,20 +142,20 @@ function _byAverage(rangeDataSet, beginIndex, reduceFactor, valueType) {
  * @private
  */
 function _reduceDataSet(dataSet, algorithm, valueType) {
-    var dataSetLength = dataSet.length;
-    var reduceFactor = _findReduceFactor(dataSetLength);
+    let dataSetLength = dataSet.length;
+    let reduceFactor = _findReduceFactor(dataSetLength);
     if (reduceFactor === 0) {
         return _justFormatDataSet(dataSet);
     }
-    var reducedDataSet = [];
-    var lastIndex = dataSetLength - (dataSetLength % reduceFactor);
-    for(var index = 0; index < lastIndex; index = index+reduceFactor) {
+    let reducedDataSet = [];
+    let lastIndex = dataSetLength - (dataSetLength % reduceFactor);
+    for(let index = 0; index < lastIndex; index = index+reduceFactor) {
         reducedDataSet.push(algorithm(dataSet, index, reduceFactor, valueType));
     }
     //
-    var hasIteratedLength = reducedDataSet.length * reduceFactor;
+    let hasIteratedLength = reducedDataSet.length * reduceFactor;
     if (hasIteratedLength < dataSetLength) {
-        for(var otherIndex = hasIteratedLength; otherIndex < dataSetLength; otherIndex++) {
+        for(let otherIndex = hasIteratedLength; otherIndex < dataSetLength; otherIndex++) {
             reducedDataSet.push([dataSet[otherIndex].created_time, dataSet[otherIndex].value]);
         }
     }
@@ -169,7 +169,7 @@ function _reduceDataSet(dataSet, algorithm, valueType) {
  * @private
  */
 function _justFormatDataSet(dataSet) {
-    var formatedDataSet = [];
+    let formatedDataSet = [];
     dataSet.forEach(data => {
        formatedDataSet.push([data.created_time, data.value]);
     });
@@ -223,7 +223,7 @@ function _stat(req, res) {
             return;
         }
 
-        var targetSeriesData = {};
+        let targetSeriesData = {};
 
         result.forEach(record => {
             if (!(record.server in targetSeriesData)) {
@@ -231,13 +231,13 @@ function _stat(req, res) {
             }
             targetSeriesData[record.server].push({created_time: Date.parse(record.created_time), value: record.value});
         });
-        var respData = {
+        let respData = {
             xAxis: graphTypeMapper[statName].xAxis ? graphTypeMapper[statName].xAxis : null,
             yAxis: graphTypeMapper[statName].yAxis ? graphTypeMapper[statName].yAxis : null,
             series: []
         };
         Object.getOwnPropertyNames(targetSeriesData).forEach(server => {
-            var mySeriesData = null;
+            let mySeriesData = null;
             if (reduceWay === 'default') {
                 mySeriesData = _justFormatDataSet(targetSeriesData[server]);
             } else {

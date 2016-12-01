@@ -13,7 +13,7 @@
 const PORT = 8080;
 const STORAGE_FILE_PATH = './rsm.db';
 
-var configuration = {
+let configuration = {
     debug: false,
     log_level: 'debug',
     port: PORT,

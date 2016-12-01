@@ -7,10 +7,10 @@
 
 'use strict';
 
-var DB = require('../models/db');
-var Template = require('../utils/template');
-var Time = require('../utils/time');
-var Logger = require('../utils/logger');
+let DB = require('../models/db');
+let Template = require('../utils/template');
+let Time = require('../utils/time');
+let Logger = require('../utils/logger');
 
 /**
  * `/home`控制器
@@ -35,18 +35,18 @@ function _home(req, res) {
             result = {master: '{}', slaves: '{}', sentinels: '{}'};
         }
 
-        var clusterInfo = {
+        let clusterInfo = {
             master: JSON.parse(result.master),
             slaves: JSON.parse(result.slaves),
             sentinels: JSON.parse(result.sentinels)
         };
 
-        var allSentinel = [];
-        var redisSentinels = clusterInfo.sentinels;
+        let allSentinel = [];
+        let redisSentinels = clusterInfo.sentinels;
 
         if (redisSentinels) {
             Object.getOwnPropertyNames(redisSentinels).forEach(ele => {
-                var thisSentinel = redisSentinels[ele];
+                let thisSentinel = redisSentinels[ele];
                 allSentinel.push({
                     address: ele,
                     version: thisSentinel.redis_version,
@@ -57,25 +57,25 @@ function _home(req, res) {
             });
         }
 
-        var allRedis = [];
+        let allRedis = [];
 
-        var rawRedisServers = {};
-        var redisMaster = clusterInfo.master;
+        let rawRedisServers = {};
+        let redisMaster = clusterInfo.master;
         if (redisMaster && Object.getOwnPropertyNames(redisMaster).length) {
             rawRedisServers[redisMaster.ip + ':' + redisMaster.port] = redisMaster;
         }
-        var redisSlaves = clusterInfo.slaves;
+        let redisSlaves = clusterInfo.slaves;
         if (redisSlaves) {
             rawRedisServers = Object.assign(rawRedisServers, redisSlaves);
         }
 
         Object.getOwnPropertyNames(rawRedisServers).forEach(function(ele) {
-            var thisRedisServer = rawRedisServers[ele];
+            let thisRedisServer = rawRedisServers[ele];
 
-            var hitRate = 0;
-            var keySpaceHits = parseInt(thisRedisServer.keyspace_hits);
-            var keySpaceMisses = parseInt(thisRedisServer.keyspace_misses);
-            var keySpaceHitMisses = keySpaceHits + keySpaceMisses;
+            let hitRate = 0;
+            let keySpaceHits = parseInt(thisRedisServer.keyspace_hits);
+            let keySpaceMisses = parseInt(thisRedisServer.keyspace_misses);
+            let keySpaceHitMisses = keySpaceHits + keySpaceMisses;
             if (keySpaceHitMisses > 0) {
                 hitRate = (keySpaceHits / keySpaceHitMisses).toFixed(3);
             }
@@ -105,7 +105,7 @@ function _home(req, res) {
             });
         });
 
-        var data = {
+        let data = {
             sentinels: allSentinel,
             redises: allRedis
         };

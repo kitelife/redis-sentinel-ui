@@ -5,13 +5,13 @@
 // store global var
 global.RootDir = __dirname;
 
-var cluster = require('cluster');
-var numCPUs = require('os').cpus().length;
-var http = require('http');
+let cluster = require('cluster');
+let numCPUs = require('os').cpus().length;
+let http = require('http');
 
-var config = require('./config');
-var routes = require('./routes');
-var Logger = require('./utils/logger');
+let config = require('./config');
+let routes = require('./routes');
+let Logger = require('./utils/logger');
 
 // 配置检查
 if (!config.sentinels.length) {
@@ -21,7 +21,7 @@ if (!config.sentinels.length) {
 if (cluster.isMaster) {
     // Fork workers.
     Logger.info('主进程id: %d', process.pid);
-    for (var i = 0; i < numCPUs; i++) {
+    for (let i = 0; i < numCPUs; i++) {
         cluster.fork();
     }
 

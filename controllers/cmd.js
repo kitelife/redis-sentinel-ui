@@ -7,11 +7,11 @@
 
 'use strict';
 
-var Redis = require('ioredis');
-var ValidRedisCMDs = require('ioredis/commands');
+let Redis = require('ioredis');
+let ValidRedisCMDs = require('ioredis/commands');
 
-var cmdRespParser = require('../utils/cmdRespParser');
-var config = require('../config');
+let cmdRespParser = require('../utils/cmdRespParser');
+let config = require('../config');
 
 // 检测 命令 是否有效
 function isValidCommand(cmd) {
@@ -32,19 +32,19 @@ function cmd(req, res) {
      * 1. cmd: 大写的Redis命令
      * 2. params: 命令参数, 多个参数以空格分隔
      */
-    var cmd = req.body.cmd.toUpperCase();
+    let cmd = req.body.cmd.toUpperCase();
     if (!cmd || !isValidCommand(cmd)) {
         res.toResponse('参数cmd不合法!', 400);
         return;
     }
-    var params = req.body.params;
+    let params = req.body.params;
     if (params === undefined) {
         res.toResponse('缺少必要的请求参数!', 400);
         return;
     }
     params = params.split(' ');
 
-    var RedisServer = new Redis({
+    let RedisServer = new Redis({
         sentinels: config.sentinels,
         name: config.master_name,
         password: config.auth

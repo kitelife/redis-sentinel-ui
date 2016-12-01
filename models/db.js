@@ -10,11 +10,11 @@
 
 'use strict';
 
-var config = require('../config');
-var sqlite3 = require('sqlite3').verbose();
+let config = require('../config');
+let sqlite3 = require('sqlite3').verbose();
 
 // 只读模式
-var db = new sqlite3.Database(config.storage_file, sqlite3.OPEN_READONLY);
+let db = new sqlite3.Database(config.storage_file, sqlite3.OPEN_READONLY);
 
 /**
  * 从数据库中获取某个sentinel的状态
@@ -43,23 +43,23 @@ function _getActiveSentinel(callback) {
 }
 
 function _getClusterInfo(callback) {
-    var masterName = config.master_name;
+    let masterName = config.master_name;
     db.get('SELECT master, slaves, sentinels FROM `cluster_info` WHERE master_name=?',
         masterName, callback
     );
 }
 
 function _getRangeConnectedClient(servers, beginTime, endTime, callback) {
-    var serverCount = servers.length;
+    let serverCount = servers.length;
 
-    var sql = 'SELECT client_num AS value, server, created_time FROM `connected_client` WHERE server IN (?';
+    let sql = 'SELECT client_num AS value, server, created_time FROM `connected_client` WHERE server IN (?';
     while (serverCount > 1) {
       sql = sql + ', ?';
       serverCount = serverCount - 1;
     }
     sql += ') AND created_time>=? AND created_time<=? ORDER BY created_time';
 
-    var stmtParams = servers;
+    let stmtParams = servers;
     stmtParams.unshift(sql);
     stmtParams.push(beginTime);
     stmtParams.push(endTime);
@@ -69,16 +69,16 @@ function _getRangeConnectedClient(servers, beginTime, endTime, callback) {
 }
 
 function _getRangeUsedMemory(servers, beginTime, endTime, callback) {
-    var serverCount = servers.length;
+    let serverCount = servers.length;
 
-    var sql = 'SELECT used_memory AS value, server, created_time FROM `used_memory` WHERE server IN (?';
+    let sql = 'SELECT used_memory AS value, server, created_time FROM `used_memory` WHERE server IN (?';
     while (serverCount > 1) {
       sql = sql + ', ?';
       serverCount = serverCount - 1;
     }
     sql += ') AND created_time>=? AND created_time<=? ORDER BY created_time';
 
-    var stmtParams = servers;
+    let stmtParams = servers;
     stmtParams.unshift(sql);
     stmtParams.push(beginTime);
     stmtParams.push(endTime);
@@ -88,16 +88,16 @@ function _getRangeUsedMemory(servers, beginTime, endTime, callback) {
 }
 
 function _getRangeCMDPS(servers, beginTime, endTime, callback) {
-    var serverCount = servers.length;
+    let serverCount = servers.length;
 
-    var sql = 'SELECT cmd_ps AS value, server, created_time FROM `cmd_ps` WHERE server IN (?';
+    let sql = 'SELECT cmd_ps AS value, server, created_time FROM `cmd_ps` WHERE server IN (?';
     while (serverCount > 1) {
         sql = sql + ', ?';
         serverCount = serverCount - 1;
     }
     sql += ') AND created_time>=? AND created_time<=? ORDER BY created_time';
 
-    var stmtParams = servers;
+    let stmtParams = servers;
     stmtParams.unshift(sql);
     stmtParams.push(beginTime);
     stmtParams.push(endTime);

@@ -5,7 +5,7 @@
 'use strict';
 
 function _infoRespParser(resp) {
-    var mapper = {};
+    let mapper = {};
 
     resp.forEach(val => {
         if (val.indexOf(':') === -1) {

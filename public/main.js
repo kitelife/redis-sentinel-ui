@@ -1,13 +1,13 @@
 /**
  * Created by xiayf on 15/12/4.
  */
-var $ = jQuery = require('jquery');
-var _ = require('bootstrap');
-var __ = require('cn-bootstrap-datetimepicker');
-var Highcharts = require('highcharts');
+let $ = jQuery = require('jquery');
+let _ = require('bootstrap');
+let __ = require('cn-bootstrap-datetimepicker');
+let Highcharts = require('highcharts');
 Highcharts.setOptions({ global: { useUTC: false } });
 
-var statTitleMapper = {
+let statTitleMapper = {
     'connected_client': '客户端连接数(个)',
     'used_memory': '内存使用量(MB)',
     'cmd_ps': '每秒处理命令数(个)'
@@ -34,10 +34,10 @@ $(function () {
     $('#submit_cmd').on('click', function ($e) {
         $e.preventDefault();
 
-        var $cmdOutput = $('#cmd_output');
+        let $cmdOutput = $('#cmd_output');
         $cmdOutput.empty();
 
-        var cmd = $('input[name="cmd"]').val(),
+        let cmd = $('input[name="cmd"]').val(),
             cmdParts = cmd.split(' '),
             params = '';
         cmd = cmdParts[0];
@@ -46,15 +46,15 @@ $(function () {
         }
 
         // 加loading效果
-        var loadingPart = '<div class="row" id="loading_part">' +
+        let loadingPart = '<div class="row" id="loading_part">' +
                 '<div class="loading-tip col-md-6"">' +
                 '<span>正在执行命令,请耐心等待...</span>' +
                 '</div></div>';
         $cmdOutput.append(loadingPart);
 
-        var $loadingPart = $('#loading_part');
+        let $loadingPart = $('#loading_part');
 
-        var req = $.ajax({
+        let req = $.ajax({
             "method": "POST",
             "url": "/cmd",
             "data": {
@@ -78,26 +78,26 @@ $(function () {
     $('#show_stat').on('click', function ($e) {
         $e.preventDefault();
 
-        var selectedServer = [];
+        let selectedServer = [];
         $('.server input').each(function () {
             if ($(this).prop('checked')) {
                 selectedServer.push($(this).val());
             }
         });
 
-        var selectedIndex = [];
+        let selectedIndex = [];
         $('.index input').each(function () {
             if ($(this).prop('checked')) {
                 selectedIndex.push($(this).val());
             }
         });
 
-        var reduceWay = $('input[name="reduce_way"]:checked').val();
+        let reduceWay = $('input[name="reduce_way"]:checked').val();
 
-        var beginDateTime = $('input[name="begin-datetime"]').val();
-        var endDateTime = $('input[name="end-datetime"]').val();
+        let beginDateTime = $('input[name="begin-datetime"]').val();
+        let endDateTime = $('input[name="end-datetime"]').val();
 
-        var $statGraphPart = $('.stat-graph-part');
+        let $statGraphPart = $('.stat-graph-part');
         $statGraphPart.empty();
 
         if (selectedServer.length === 0 || selectedIndex.length === 0 || !beginDateTime || !endDateTime) {
@@ -108,7 +108,7 @@ $(function () {
         // 一个指标一张图
         selectedIndex.forEach(function (ele) {
             // 加loading效果
-            var loadingPartID = 'loading_' + ele,
+            let loadingPartID = 'loading_' + ele,
                 loadingPart = '<div class="row" id="'+ loadingPartID +'">' +
                     '<div class="loading-tip col-md-6"">' +
                     '<span>正在加载数据,请耐心等待...</span>' +
@@ -116,7 +116,7 @@ $(function () {
 
             $statGraphPart.append(loadingPart);
 
-            var req = $.ajax({
+            let req = $.ajax({
                 method: 'POST',
                 url: "/stat",
                 data: {
@@ -132,7 +132,7 @@ $(function () {
                 //
                 $('#' + loadingPartID).remove();
 
-                var containerID = 'container_' + ele;
+                let containerID = 'container_' + ele;
                 $('.stat-graph-part').append('<div id=' + containerID + '></div>');
 
                 $('#' + containerID).highcharts({

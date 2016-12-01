@@ -11,18 +11,18 @@
 
 'use strict';
 
-var crypto = require('crypto');
-var fs = require('fs');
-var path = require('path');
-var mime = require('mime-types');
-var debug = require('debug')('staticServ');
-var config = require('../config');
-var Logger = require('./logger');
+let crypto = require('crypto');
+let fs = require('fs');
+let path = require('path');
+let mime = require('mime-types');
+let debug = require('debug')('staticServ');
+let config = require('../config');
+let Logger = require('./logger');
 
-var staticFileObjs = Object.create(null);
-var staticDir = path.join(global.RootDir, 'public');
+let staticFileObjs = Object.create(null);
+let staticDir = path.join(global.RootDir, 'public');
 
-var options = {
+let options = {
     buffer: !config.debug,
     maxAge: config.debug ? 0 : 60 * 60 * 24 * 7
 };
@@ -42,7 +42,7 @@ function staticCache(dir, options, files) {
     dir = dir || options.dir || process.cwd();
 
     // option.filter
-    var fileFilter = function () { return true };
+    let fileFilter = function () { return true };
     if (Array.isArray(options.filter)) fileFilter = function (file) { return ~options.filter.indexOf(file) };
     if (typeof options.filter === 'function') fileFilter = options.filter;
 
@@ -64,7 +64,7 @@ function readDirRecursive(root, filter, files, prefix) {
     files = files || [];
     filter = filter || noDotFiles;
 
-    var dir = path.join(root, prefix);
+    let dir = path.join(root, prefix);
     if (!fs.existsSync(dir)) return files;
     if (fs.statSync(dir).isDirectory())
         fs.readdirSync(dir)
@@ -98,10 +98,10 @@ function noDotFiles(x) {
  */
 function loadFile(pathname, dir, options, files) {
     // 引用, 修改了obj,即修改了files[pathname]
-    var obj = files[pathname] = files[pathname] ? files[pathname] : {};
-    var filename = obj.path = path.join(dir, pathname);
-    var stats = fs.statSync(filename);
-    var buffer = fs.readFileSync(filename);
+    let obj = files[pathname] = files[pathname] ? files[pathname] : {};
+    let filename = obj.path = path.join(dir, pathname);
+    let stats = fs.statSync(filename);
+    let buffer = fs.readFileSync(filename);
 
     obj.cacheControl = options.cacheControl;
     obj.maxAge = obj.maxAge ? obj.maxAge : options.maxAge || 0;
@@ -139,11 +139,11 @@ function staticService(pathname, callback) {
 
     // 去掉'/public/'
     pathname = pathname.slice(config.static_prefix.length);
-    var filename = safeDecodeURIComponent(path.normalize(pathname));
+    let filename = safeDecodeURIComponent(path.normalize(pathname));
 
-    var filePath = path.join(staticDir, pathname);
+    let filePath = path.join(staticDir, pathname);
     try {
-        var fileStat = fs.statSync(filePath);
+        let fileStat = fs.statSync(filePath);
     } catch (err) {
         Logger.error(err);
 
@@ -162,7 +162,7 @@ function staticService(pathname, callback) {
         return;
     }
 
-    var file = staticFileObjs[filename];
+    let file = staticFileObjs[filename];
     if (!file) {
         if (path.basename(filename)[0] === '.') {
             callback({code: 403, msg: '没有权限'});

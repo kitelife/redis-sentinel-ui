@@ -1,9 +1,9 @@
 'use strict';
 
-var Log = require('log');
+let Log = require('log');
 
-var config = require('../config');
+let config = require('../config');
 
-var _logger = new Log(config.log_level ? config.log_level : 'info');
+let _logger = new Log(config.log_level ? config.log_level : 'info');
 
 module.exports = _logger;

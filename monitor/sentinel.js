@@ -62,13 +62,13 @@ var addNewCMDPS = function (server, cmd_ps) {
 const oneM = 1048576;
 
 // 存储Sentinel状态
-var AllSentinelStatus = {};
+let AllSentinelStatus = {};
 // 存储Sentinel的连接对象
-var RedisSentinels = [];
+let RedisSentinels = [];
 // 存储Redis的连接对象
-var RedisServers = [];
+let RedisServers = [];
 // Sentinel集群信息
-var ClusterInfo = {
+let ClusterInfo = {
     master: null,
     slaves: null,
     sentinels: null
@@ -88,7 +88,7 @@ config.sentinels.forEach(val => {
  * @returns {{}}
  */
 function _parseSentinelSingle(result) {
-    var mapper = {};
+    let mapper = {};
 
     for (let start = 0, end = result.length - 1; start < end; start += 2) {
         mapper[result[start]] = result[start + 1];
@@ -103,7 +103,7 @@ function _parseSentinelSingle(result) {
  * @returns {{}}
  */
 function _parseSentinelMulti(result) {
-    var multiMapper = {};
+    let multiMapper = {};
 
     for (let start = 0, end = result.length; start < end; start++) {
         let parsedResult = _parseSentinelSingle(result[start]);
@@ -136,7 +136,7 @@ function _mergeObject(first, second) {
  * @param group
  */
 function _connAndInfo(host, port, group) {
-    var redisServer = new Redis({
+    let redisServer = new Redis({
         host: host,
         port: port,
         password: group === 'sentinels' ? null : config.auth
@@ -159,7 +159,7 @@ function _connAndInfo(host, port, group) {
     });
 
     if (group !== 'sentinels') {
-        var serverAddr = host + ':' + port;
+        let serverAddr = host + ':' + port;
         if (RedisServers.indexOf(serverAddr) === -1) {
             RedisServers.push(serverAddr);
         }
@@ -172,9 +172,9 @@ function _connAndInfo(host, port, group) {
  * @private
  */
 function _fetchClusterInfo() {
-    var activeSentinel = null;
+    let activeSentinel = null;
 
-    var sentinelAddrs = Object.getOwnPropertyNames(AllSentinelStatus),
+    let sentinelAddrs = Object.getOwnPropertyNames(AllSentinelStatus),
         sentinelNum = sentinelAddrs.length,
         sentinelIndex = 0;
     while (sentinelIndex < sentinelNum) {
@@ -189,7 +189,7 @@ function _fetchClusterInfo() {
         return;
     }
 
-    var sentinelInfo = activeSentinel.split(':'),
+    let sentinelInfo = activeSentinel.split(':'),
         sentinelInstance = new Redis({
             host: sentinelInfo[0],
             port: sentinelInfo[1]
@@ -240,12 +240,12 @@ function _fetchClusterInfo() {
             return;
         }
 
-        var parsedResultNoMe = _parseSentinelMulti(result);
+        let parsedResultNoMe = _parseSentinelMulti(result);
 
         //
-        var otherSentinelAddrs = Object.getOwnPropertyNames(parsedResultNoMe);
+        let otherSentinelAddrs = Object.getOwnPropertyNames(parsedResultNoMe);
         if (otherSentinelAddrs.length) {
-            var selectedAnotherSentinel = otherSentinelAddrs[0].split(':'),
+            let selectedAnotherSentinel = otherSentinelAddrs[0].split(':'),
                 anotherSentinelInstance = new Redis({
                     host: selectedAnotherSentinel[0],
                     port: selectedAnotherSentinel[1]
@@ -307,7 +307,7 @@ function _updateSentinelStatus() {
  */
 function _collectServerInfo() {
     RedisServers.forEach(addr => {
-        var ipPort = addr.split(':'),
+        let ipPort = addr.split(':'),
             newRedisConn = new Redis({
                 host: ipPort[0],
                 port: ipPort[1],

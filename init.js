@@ -5,15 +5,15 @@
 
 'use strict';
 
-var config = require('./config');
-var sqlite3 = require('sqlite3').verbose();
+let config = require('./config');
+let sqlite3 = require('sqlite3').verbose();
 
-var db = new sqlite3.Database(config.storage_file);
+let db = new sqlite3.Database(config.storage_file);
 
 /**
  * 初始化sqlite数据表
  */
-var create_sentinels_sql = `
+let create_sentinels_sql = `
     CREATE TABLE IF NOT EXISTS sentinels (
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         sentinel TEXT NOT NULL UNIQUE,
@@ -25,7 +25,7 @@ db.serialize(function() {
     db.run('DELETE FROM sentinels');
 });
 
-var create_clusterinfo_sql = `
+let create_clusterinfo_sql = `
     CREATE TABLE IF NOT EXISTS cluster_info (
         master_name TEXT NOT NULL UNIQUE,
         master TEXT NOT NULL DEFAULT '{}',
@@ -39,7 +39,7 @@ db.serialize(function() {
     db.run('INSERT INTO `cluster_info` (`master_name`) VALUES (?)', config.master_name);
 });
 
-var create_connected_client = `
+let create_connected_client = `
 CREATE TABLE IF NOT EXISTS connected_client (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     server TEXT NOT NULL,
@@ -51,7 +51,7 @@ db.run(create_connected_client);
 // 手动添加个索引吧
 // CREATE INDEX connected_client_server_idx ON connected_client (server);
 
-var create_used_memory = `
+let create_used_memory = `
 CREATE TABLE IF NOT EXISTS used_memory (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     server TEXT NOT NULL,
@@ -63,7 +63,7 @@ db.run(create_used_memory);
 // 手动添加个索引吧
 // CREATE INDEX used_memory_server_idx ON used_memory (server);
 
-var create_cmd_per_second = `
+let create_cmd_per_second = `
 CREATE TABLE IF NOT EXISTS cmd_ps (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     server TEXT NOT NULL,

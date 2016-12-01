@@ -7,19 +7,19 @@
 
 'use strict';
 
-var fs = require('fs');
-var urlParser = require('url');
+let fs = require('fs');
+let urlParser = require('url');
 //const qs = require('querystring');
 
-var Parser = require('co-body');
+let Parser = require('co-body');
 
-var controllers = require('./controllers');
-var StaticServ = require('./utils/staticServ');
-var RespUtil = require('./utils/resp');
-var Logger = require('./utils/logger');
+let controllers = require('./controllers');
+let StaticServ = require('./utils/staticServ');
+let RespUtil = require('./utils/resp');
+let Logger = require('./utils/logger');
 
 // Web路由
-var routes = {
+let routes = {
     '/': {
         'verb': ['GET'],
         'action': controllers.Home
@@ -43,10 +43,10 @@ var routes = {
 };
 
 function* _parseReqBody(req) {
-    var type = 'form';
-    var body;
+    let type = 'form';
+    let body;
 
-    var headers = req.headers;
+    let headers = req.headers;
     if ('content-type' in headers) {
         if (headers['content-type'] === 'application/json') {
             type = 'json';
@@ -101,11 +101,11 @@ function _router(req, res) {
             return;
         }
         if (result.cached) {
-            var data = result.data;
+            let data = result.data;
 
-            var statusCode = 200;
+            let statusCode = 200;
             // 写响应头, 以及可能相应304
-            var ifNoneMatch = req.headers['if-none-match'];
+            let ifNoneMatch = req.headers['if-none-match'];
             if (ifNoneMatch && ifNoneMatch == data.md5) {
                 statusCode = 304;
             }
