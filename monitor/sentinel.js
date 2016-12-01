@@ -9,15 +9,15 @@
 
 'use strict';
 
-var Redis = require('ioredis');
-var StdUtil = require('util');
-var sqlite3 = require('sqlite3').verbose();
-var config = require('../config');
-var cmdRespParser = require('../utils/cmdRespParser');
-var Logger = require('../utils/logger');
+let Redis = require('ioredis');
+let StdUtil = require('util');
+let sqlite3 = require('sqlite3').verbose();
+let config = require('../config');
+let cmdRespParser = require('../utils/cmdRespParser');
+let Logger = require('../utils/logger');
 
 // 模式默认：OPEN_READWRITE | OPEN_CREATE
-var db = new sqlite3.Database(config.storage_file);
+let db = new sqlite3.Database(config.storage_file);
 
 /**
  * 更新数据库中sentinel的状态
@@ -27,7 +27,7 @@ var db = new sqlite3.Database(config.storage_file);
  * @param callback
  * @private
  */
-var updateSentinelStatus = function (sentinel_addr, status, callback) {
+let updateSentinelStatus = function (sentinel_addr, status, callback) {
     db.run('REPLACE INTO `sentinels` (`sentinel`, `status`) VALUES (?, ?)',
         sentinel_addr,
         status,
@@ -35,24 +35,24 @@ var updateSentinelStatus = function (sentinel_addr, status, callback) {
     );
 };
 
-var saveClusterPart = function (partData, partName) {
+let saveClusterPart = function (partData, partName) {
     partData = JSON.stringify(partData);
-    var masterName = config.master_name;
-    var sql = StdUtil.format('UPDATE `cluster_info` SET `%s`=? WHERE `master_name`=?', partName);
+    let masterName = config.master_name;
+    let sql = StdUtil.format('UPDATE `cluster_info` SET `%s`=? WHERE `master_name`=?', partName);
     db.run(sql, partData, masterName);
 };
 
-var addNewConnectedClient = function (server, clientNum) {
+let addNewConnectedClient = function (server, clientNum) {
     db.run('INSERT INTO `connected_client` (`server`, `client_num`) VALUES (?, ?)',
         server, clientNum);
 };
 
-var addNewUsedMemory = function (server, usedMemory) {
+let addNewUsedMemory = function (server, usedMemory) {
     db.run('INSERT INTO `used_memory` (`server`, `used_memory`) VALUES (?, ?)',
         server, usedMemory);
 };
 
-var addNewCMDPS = function (server, cmd_ps) {
+let addNewCMDPS = function (server, cmd_ps) {
     db.run('INSERT INTO `cmd_ps` (`server`, `cmd_ps`) VALUES (?, ?)', server, cmd_ps);
 };
 
