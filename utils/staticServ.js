@@ -142,12 +142,18 @@ function staticService(pathname, callback) {
     let filename = safeDecodeURIComponent(path.normalize(pathname));
 
     let filePath = path.join(staticDir, pathname);
+    let fileStat;
     try {
-        let fileStat = fs.statSync(filePath);
+        fileStat = fs.statSync(filePath);
     } catch (err) {
         Logger.error(err);
 
         callback({code: 500, msg: '系统异常'});
+        return;
+    }
+
+    if (!fileStat){
+        callback({code:500, msg:'fileStat does not exist'});
         return;
     }
 
